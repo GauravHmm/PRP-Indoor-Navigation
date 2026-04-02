@@ -38,43 +38,37 @@ export const BLOCKS: BlockDef[] = [
   }
 ]
 
-// ── C BLOCK SUB-SHAPES (ENLARGED) ───────────────────────────
-// L3: cx=305,cy=290,r=35
-// L2: cx=360,cy=375,r=50
-// L1: cx=420,cy=468,r=55
-// GEM: pentagon from sketch — wide top, sides angle outward then in to bottom point
-// R1: cx=580,cy=468,r=55
-// R2: cx=640,cy=375,r=50
-// R3: cx=695,cy=290,r=35
-
-// Pointy-top hex vertices: top(cx,cy-r), UR(cx+r*.866,cy-r*.5),
-// LR(cx+r*.866,cy+r*.5), bot(cx,cy+r), LL(cx-r*.866,cy+r*.5), UL(cx-r*.866,cy-r*.5)
+// ── C BLOCK SUB-SHAPES ──────────────────────────────────────
+// L3/R3: directly attached to E/A blocks (connector hexes)
+// L2/R2: rotated 45° inward per sketch
+// L1/R1: standard pointy-top hexes
+// GEM: pentagon center
 
 export const C_SHAPES: SubShapeDef[] = [
-  // L3 (cx=305 cy=290 r=35): 305,255 335,273 335,308 305,325 275,308 275,273
-  { id: "C_L3", polygon: "305,255 335,273 335,308 305,325 275,308 275,273" },
-  // L2 (cx=360 cy=375 r=50): 360,325 403,350 403,400 360,425 317,400 317,350
-  { id: "C_L2", polygon: "360,325 403,350 403,400 360,425 317,400 317,350" },
-  // L1 (cx=420 cy=468 r=55): 420,413 468,441 468,496 420,523 372,496 372,441
+  // L3 (directly attached to E, cx=300 cy=272 r=30)
+  { id: "C_L3", polygon: "300,242 326,257 326,287 300,302 274,287 274,257" },
+  // L2 (rotated -45° counter-clockwise, cx=360 cy=380 r=48)
+  { id: "C_L2", polygon: "326,346 372,334 406,368 394,414 348,426 314,392" },
+  // L1 (cx=420 cy=468 r=55): standard
   { id: "C_L1", polygon: "420,413 468,441 468,496 420,523 372,496 372,441" },
 
-  // GEM center — clean 5-point pentagon: flat top, pointed bottom (from sketch)
+  // GEM center
   { id: "C_DI", polygon: "440,525 560,525 565,565 500,600 435,565" },
 
-  // R1 (cx=580 cy=468 r=55): 580,413 628,441 628,496 580,523 532,496 532,441
+  // R1 (cx=580 cy=468 r=55): standard
   { id: "C_R1", polygon: "580,413 628,441 628,496 580,523 532,496 532,441" },
-  // R2 (cx=640 cy=375 r=50): 640,325 683,350 683,400 640,425 597,400 597,350
-  { id: "C_R2", polygon: "640,325 683,350 683,400 640,425 597,400 597,350" },
-  // R3 (cx=695 cy=290 r=35): 695,255 725,273 725,308 695,325 665,308 665,273
-  { id: "C_R3", polygon: "695,255 725,273 725,308 695,325 665,308 665,273" },
+  // R2 (rotated 45° clockwise, cx=640 cy=380 r=48)
+  { id: "C_R2", polygon: "674,346 686,392 652,426 606,414 594,368 628,334" },
+  // R3 (directly attached to A, cx=700 cy=272 r=30)
+  { id: "C_R3", polygon: "700,242 726,257 726,287 700,302 674,287 674,257" },
 
-  // Corridor passages (width ~18)
-  { id: "C_cL3L2", polygon: "298,318 312,318 367,330 353,330" },
-  { id: "C_cL2L1", polygon: "353,418 367,418 427,418 413,418" },
-  { id: "C_cL1DI", polygon: "413,516 427,516 445,525 433,530" },
-  { id: "C_cR3R2", polygon: "688,318 702,318 647,330 633,330" },
-  { id: "C_cR2R1", polygon: "633,418 647,418 587,418 573,418" },
-  { id: "C_cR1DI", polygon: "573,516 587,516 567,530 555,525" },
+  // Corridor passages (wider ~24px trapezoids)
+  { id: "C_cL3L2", polygon: "290,298 310,298 365,330 340,340" },
+  { id: "C_cL2L1", polygon: "385,418 400,418 430,430 415,435" },
+  { id: "C_cL1DI", polygon: "410,518 430,518 445,528 425,528" },
+  { id: "C_cR3R2", polygon: "690,298 710,298 670,340 645,330" },
+  { id: "C_cR2R1", polygon: "600,416 615,418 575,435 565,430" },
+  { id: "C_cR1DI", polygon: "570,528 555,528 570,518 590,518" },
 ]
 
 export const C_FILL = "#dbeafe"
@@ -83,13 +77,13 @@ export const C_STROKE = "#2563eb"
 // ── CONNECTORS ──────────────────────────────────────────────
 
 export const CONNECTORS: ConnectorDef[] = [
-  // E bottom → L3 top
-  { id: "conn_E_C", polygon: "275,273 305,255 335,273 315,218 250,250", fill: "#d4dff7" },
-  // A bottom → R3 top
-  { id: "conn_A_C", polygon: "665,273 695,255 725,273 685,218 750,250", fill: "#d4dff7" },
-  // Gem lower-left → D (from left side of pentagon)
+  // E bottom → L3 top (directly attached, seamless bridge)
+  { id: "conn_E_C", polygon: "235,245 265,245 326,255 274,255", fill: "#d4dff7" },
+  // A bottom → R3 top (directly attached, seamless bridge)
+  { id: "conn_A_C", polygon: "735,245 765,245 726,255 674,255", fill: "#d4dff7" },
+  // Gem lower-left → D
   { id: "conn_C_D", polygon: "438,562 448,572 375,660 360,645", fill: "#e8dfc7" },
-  // Gem lower-right → B (from right side of pentagon)
+  // Gem lower-right → B
   { id: "conn_C_B", polygon: "552,572 562,562 640,645 625,660", fill: "#e8dfc7" },
 ]
 

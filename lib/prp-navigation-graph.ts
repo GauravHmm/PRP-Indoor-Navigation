@@ -54,7 +54,8 @@ const E_NODES: NavNode[] = [
 
 // ═══ A BLOCK ═══
 // Hex: (750,55)(820,95)(820,210)(750,250)(680,210)(680,95)
-// LEFT (A1): no rooms, only stairs/lift. RIGHT (A2): all rooms.
+// LEFT (A1): G49,G48 above entrance; G45,G44 below; stairs/lift on both sides of A1
+// RIGHT (A2): G51,G52 above entrance; G53,G54 below
 // CENTER: two sitting areas. Straight path A1→A2.
 
 const A_NODES: NavNode[] = [
@@ -64,13 +65,13 @@ const A_NODES: NavNode[] = [
   // Top & bottom intersections
   { id: "A_it", x: 750, y: 72, floor: 1, block: "A", type: "intersection", name: "A" },
   { id: "A_ib", x: 750, y: 235, floor: 1, block: "A", type: "intersection", name: "A" },
-  // Left wall corridor (no rooms here — just services)
+  // Left wall corridor
   { id: "A_lc1", x: 700, y: 98, floor: 1, block: "A", type: "corridor", name: "A" },
   { id: "A_lc2", x: 695, y: 125, floor: 1, block: "A", type: "corridor", name: "A" },
   { id: "A_lc3", x: 690, y: 152, floor: 1, block: "A", type: "corridor", name: "A" },
   { id: "A_lc4", x: 695, y: 180, floor: 1, block: "A", type: "corridor", name: "A" },
   { id: "A_lc5", x: 700, y: 205, floor: 1, block: "A", type: "corridor", name: "A" },
-  // Right wall corridor (rooms connect from here)
+  // Right wall corridor
   { id: "A_rc1", x: 800, y: 98, floor: 1, block: "A", type: "corridor", name: "A" },
   { id: "A_rc2", x: 805, y: 120, floor: 1, block: "A", type: "corridor", name: "A" },
   { id: "A_rc3", x: 810, y: 152, floor: 1, block: "A", type: "corridor", name: "A" },
@@ -81,19 +82,21 @@ const A_NODES: NavNode[] = [
   { id: "A_mc1", x: 720, y: 152, floor: 1, block: "A", type: "corridor", name: "A" },
   { id: "A_mc2", x: 750, y: 152, floor: 1, block: "A", type: "corridor", name: "A" },
   { id: "A_mc3", x: 780, y: 152, floor: 1, block: "A", type: "corridor", name: "A" },
-  // LEFT side services (no rooms)
+  // Services
   { id: "A_s1", x: 750, y: 62, floor: 1, block: "A", type: "stairs", name: "Stairs/Lift", description: "top of A block" },
-  { id: "A_sl_ul", x: 685, y: 112, floor: 1, block: "A", type: "stairs", name: "Stairs/Lift", description: "upper left, A block" },
-  { id: "A_sl_ll", x: 685, y: 190, floor: 1, block: "A", type: "stairs", name: "Stairs/Lift", description: "lower left, A block" },
-  // RIGHT side rooms (A2 side, top→bottom per sketch)
-  { id: "A_G49", x: 795, y: 88, floor: 1, block: "A", type: "room", name: "G49", description: "A block" },
-  { id: "A_G48", x: 815, y: 100, floor: 1, block: "A", type: "room", name: "G48", description: "A block" },
+  { id: "A_sl_ul", x: 685, y: 118, floor: 1, block: "A", type: "stairs", name: "Stairs/Lift", description: "upper left, A block" },
+  { id: "A_sl_ll", x: 685, y: 185, floor: 1, block: "A", type: "stairs", name: "Stairs/Lift", description: "lower left, A block" },
+  // LEFT side rooms (A1 side)
+  { id: "A_G49", x: 688, y: 100, floor: 1, block: "A", type: "room", name: "G49", description: "A block" },
+  { id: "A_G48", x: 685, y: 108, floor: 1, block: "A", type: "room", name: "G48", description: "A block" },
+  { id: "A_G45", x: 688, y: 195, floor: 1, block: "A", type: "room", name: "G45", description: "A block" },
+  { id: "A_G44", x: 695, y: 210, floor: 1, block: "A", type: "room", name: "G44", description: "A block" },
+  // RIGHT side rooms (A2 side, top→bottom)
   { id: "A_G51", x: 815, y: 118, floor: 1, block: "A", type: "room", name: "G51", description: "Biosafety Level-II Lab" },
   { id: "A_G52", x: 815, y: 136, floor: 1, block: "A", type: "room", name: "G52", description: "Molecular Technology Lab" },
   { id: "A_G53", x: 815, y: 172, floor: 1, block: "A", type: "room", name: "G53", description: "Genomics & Bioinformation Lab" },
   { id: "A_G54", x: 815, y: 192, floor: 1, block: "A", type: "room", name: "G54", description: "Phage Directory Lab" },
-  { id: "A_wr", x: 808, y: 205, floor: 1, block: "A", type: "room", name: "Washroom", description: "Men/Women, A block" },
-  // Sitting areas (center of hex, searchable)
+  // Sitting areas (center of hex, dead-end)
   { id: "A_sit1", x: 750, y: 120, floor: 1, block: "A", type: "room", name: "Sitting Area", description: "upper, A block" },
   { id: "A_sit2", x: 750, y: 185, floor: 1, block: "A", type: "room", name: "Sitting Area", description: "lower, A block" },
   // Bottom
@@ -103,47 +106,48 @@ const A_NODES: NavNode[] = [
 // ═══ C BLOCK ═══
 
 const C_NODES: NavNode[] = [
-  { id: "C_entE", x: 305, y: 260, floor: 1, block: "C", type: "entrance", name: "To E Block" },
-  { id: "C_entA", x: 695, y: 260, floor: 1, block: "C", type: "entrance", name: "To A Block" },
+  { id: "C_entE", x: 300, y: 248, floor: 1, block: "C", type: "entrance", name: "To E Block" },
+  { id: "C_entA", x: 700, y: 248, floor: 1, block: "C", type: "entrance", name: "To A Block" },
   { id: "C1", x: 500, y: 530, floor: 1, block: "C", type: "entrance", name: "C1 Entrance", description: "main courtyard" },
   { id: "C3", x: 375, y: 468, floor: 1, block: "C", type: "entrance", name: "C3 Entrance", description: "left" },
 
-  // ── L3 HEX (cx=305 cy=290 r=35) ──
-  { id: "L3t", x: 305, y: 262, floor: 1, block: "C", type: "intersection", name: "L3" },
-  { id: "L3c", x: 305, y: 290, floor: 1, block: "C", type: "corridor", name: "L3" },
-  { id: "L3b", x: 305, y: 318, floor: 1, block: "C", type: "intersection", name: "L3" },
+  // ── L3 HEX (cx=300 cy=272 r=30, directly attached to E) ──
+  { id: "L3t", x: 300, y: 248, floor: 1, block: "C", type: "intersection", name: "L3" },
+  { id: "L3c", x: 300, y: 272, floor: 1, block: "C", type: "corridor", name: "L3" },
+  { id: "L3b", x: 300, y: 298, floor: 1, block: "C", type: "intersection", name: "L3" },
+  { id: "L3_wr_w", x: 278, y: 265, floor: 1, block: "C", type: "room", name: "Washroom", description: "Women, E-C connector" },
+  { id: "L3_wr_m", x: 278, y: 280, floor: 1, block: "C", type: "room", name: "Washroom", description: "Men, E-C connector" },
+  { id: "L3_sl", x: 322, y: 272, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "E-C connector" },
 
-  // Corridor L3→L2 (more nodes for smoother path + Water node)
-  { id: "cA", x: 315, y: 320, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cA2", x: 325, y: 322, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cB", x: 335, y: 325, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "L3L2_w", x: 342, y: 320, floor: 1, block: "C", type: "room", name: "Water", description: "drinking water" },
-  { id: "cB2", x: 345, y: 328, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cC", x: 352, y: 332, floor: 1, block: "C", type: "corridor", name: "c" },
+  // Corridor L3→L2
+  { id: "cA", x: 306, y: 302, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cA2", x: 316, y: 310, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cB", x: 326, y: 318, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cB2", x: 336, y: 326, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cC", x: 346, y: 334, floor: 1, block: "C", type: "corridor", name: "c" },
 
-  // ── L2 HEX (cx=360 cy=375 r=50) ──
-  { id: "L2t", x: 360, y: 335, floor: 1, block: "C", type: "intersection", name: "L2" },
-  { id: "L2b", x: 360, y: 412, floor: 1, block: "C", type: "intersection", name: "L2" },
-  { id: "L2_lc1", x: 338, y: 352, floor: 1, block: "C", type: "corridor", name: "L2" },
-  { id: "L2_lc2", x: 335, y: 375, floor: 1, block: "C", type: "corridor", name: "L2" },
-  { id: "L2_lc3", x: 338, y: 398, floor: 1, block: "C", type: "corridor", name: "L2" },
-  { id: "L2_rc1", x: 382, y: 352, floor: 1, block: "C", type: "corridor", name: "L2" },
-  { id: "L2_rc2", x: 385, y: 375, floor: 1, block: "C", type: "corridor", name: "L2" },
-  { id: "L2_rc3", x: 382, y: 398, floor: 1, block: "C", type: "corridor", name: "L2" },
-  // Rooms around perimeter
-  { id: "C_G28", x: 340, y: 340, floor: 1, block: "C", type: "room", name: "G28", description: "Electrical room" },
-  { id: "C_G27", x: 322, y: 382, floor: 1, block: "C", type: "room", name: "G27" },
-  { id: "L2_sl", x: 322, y: 360, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "left" },
-  { id: "C_G26", x: 385, y: 340, floor: 1, block: "C", type: "room", name: "G26" },
-  { id: "C_G25", x: 398, y: 378, floor: 1, block: "C", type: "room", name: "G25" },
+  // ── L2 HEX (rotated -45°, cx=360 cy=380 r=48) ──
+  { id: "L2t", x: 360, y: 340, floor: 1, block: "C", type: "intersection", name: "L2" },
+  { id: "L2b", x: 360, y: 420, floor: 1, block: "C", type: "intersection", name: "L2" },
+  { id: "L2_lc1", x: 335, y: 358, floor: 1, block: "C", type: "corridor", name: "L2" },
+  { id: "L2_lc2", x: 328, y: 380, floor: 1, block: "C", type: "corridor", name: "L2" },
+  { id: "L2_lc3", x: 335, y: 405, floor: 1, block: "C", type: "corridor", name: "L2" },
+  { id: "L2_rc1", x: 385, y: 355, floor: 1, block: "C", type: "corridor", name: "L2" },
+  { id: "L2_rc2", x: 392, y: 380, floor: 1, block: "C", type: "corridor", name: "L2" },
+  { id: "L2_rc3", x: 385, y: 405, floor: 1, block: "C", type: "corridor", name: "L2" },
+  { id: "C_G28", x: 320, y: 365, floor: 1, block: "C", type: "room", name: "G28", description: "Electrical room" },
+  { id: "C_G27", x: 318, y: 395, floor: 1, block: "C", type: "room", name: "G27" },
+  { id: "C_G26", x: 400, y: 358, floor: 1, block: "C", type: "room", name: "G26" },
+  { id: "C_G25", x: 395, y: 400, floor: 1, block: "C", type: "room", name: "G25" },
+  { id: "L2_sl", x: 318, y: 380, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "L2 left" },
 
-  // Corridor L2→L1 (more nodes + Water)
-  { id: "cD", x: 368, y: 416, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cD2", x: 378, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cE", x: 388, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "L2L1_w", x: 395, y: 412, floor: 1, block: "C", type: "room", name: "Water", description: "drinking water" },
-  { id: "cE2", x: 398, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cF", x: 408, y: 420, floor: 1, block: "C", type: "corridor", name: "c" },
+  // Corridor L2→L1 + Water
+  { id: "cD", x: 370, y: 422, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cD2", x: 382, y: 425, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cE", x: 394, y: 428, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "L2L1_w", x: 388, y: 420, floor: 1, block: "C", type: "room", name: "Water", description: "drinking water, L2-L1" },
+  { id: "cE2", x: 405, y: 430, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cF", x: 415, y: 428, floor: 1, block: "C", type: "corridor", name: "c" },
 
   // ── L1 HEX (cx=420 cy=468 r=55) ──
   { id: "L1t", x: 420, y: 422, floor: 1, block: "C", type: "intersection", name: "L1" },
@@ -154,20 +158,20 @@ const C_NODES: NavNode[] = [
   { id: "L1_rc1", x: 448, y: 445, floor: 1, block: "C", type: "corridor", name: "L1" },
   { id: "L1_rc2", x: 452, y: 468, floor: 1, block: "C", type: "corridor", name: "L1" },
   { id: "L1_rc3", x: 448, y: 492, floor: 1, block: "C", type: "corridor", name: "L1" },
-  { id: "C_G21", x: 395, y: 430, floor: 1, block: "C", type: "room", name: "G21" },
+  { id: "C_G21", x: 382, y: 448, floor: 1, block: "C", type: "room", name: "G21" },
   { id: "C_G70", x: 378, y: 490, floor: 1, block: "C", type: "room", name: "G70" },
-  { id: "C_G17", x: 450, y: 432, floor: 1, block: "C", type: "room", name: "G17" },
-  { id: "C_G18", x: 462, y: 470, floor: 1, block: "C", type: "room", name: "G18" },
-  { id: "L1_sl", x: 378, y: 455, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "left" },
+  { id: "L1_sl", x: 378, y: 502, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "L1 left" },
+  { id: "C_G17", x: 462, y: 450, floor: 1, block: "C", type: "room", name: "G17" },
+  { id: "C_G18", x: 462, y: 480, floor: 1, block: "C", type: "room", name: "G18" },
 
-  // Corridor L1→Gem (more nodes)
+  // Corridor L1→Gem
   { id: "cG", x: 422, y: 512, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cG2", x: 426, y: 516, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cH", x: 430, y: 520, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cH2", x: 434, y: 522, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cI", x: 438, y: 525, floor: 1, block: "C", type: "corridor", name: "c" },
 
-  // ── GEM (440,525 560,525 565,565 500,600 435,565) ──
+  // ── GEM ──
   { id: "Dt", x: 500, y: 530, floor: 1, block: "C", type: "intersection", name: "Gem" },
   { id: "Dc1", x: 500, y: 545, floor: 1, block: "C", type: "corridor", name: "Gem" },
   { id: "Dm", x: 500, y: 558, floor: 1, block: "C", type: "intersection", name: "Gem" },
@@ -178,9 +182,9 @@ const C_NODES: NavNode[] = [
   { id: "C_G14", x: 548, y: 535, floor: 1, block: "C", type: "room", name: "G14" },
   { id: "C_G16", x: 460, y: 568, floor: 1, block: "C", type: "room", name: "G16" },
   { id: "C_G15", x: 525, y: 568, floor: 1, block: "C", type: "room", name: "G15" },
-  { id: "Gem_sl", x: 475, y: 582, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "lower" },
+  { id: "Gem_sl", x: 475, y: 582, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "lower gem" },
 
-  // Corridor Gem→R1 (more nodes)
+  // Corridor Gem→R1
   { id: "cJ", x: 562, y: 525, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cJ2", x: 566, y: 522, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cK", x: 570, y: 520, floor: 1, block: "C", type: "corridor", name: "c" },
@@ -196,50 +200,51 @@ const C_NODES: NavNode[] = [
   { id: "R1_rc1", x: 608, y: 445, floor: 1, block: "C", type: "corridor", name: "R1" },
   { id: "R1_rc2", x: 612, y: 468, floor: 1, block: "C", type: "corridor", name: "R1" },
   { id: "R1_rc3", x: 608, y: 492, floor: 1, block: "C", type: "corridor", name: "R1" },
-  { id: "C_G02", x: 555, y: 430, floor: 1, block: "C", type: "room", name: "G02" },
-  { id: "C_G07", x: 538, y: 468, floor: 1, block: "C", type: "room", name: "G07" },
-  { id: "C_G09", x: 548, y: 498, floor: 1, block: "C", type: "room", name: "G09" },
-  { id: "C_G06", x: 610, y: 432, floor: 1, block: "C", type: "room", name: "G06" },
-  { id: "C_G08", x: 622, y: 468, floor: 1, block: "C", type: "room", name: "G08" },
-  { id: "C_G11", x: 612, y: 498, floor: 1, block: "C", type: "room", name: "G11" },
-  { id: "R1_sl", x: 622, y: 452, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "right" },
+  { id: "R1_G07", x: 540, y: 448, floor: 1, block: "C", type: "room", name: "G07" },
+  { id: "R1_G08", x: 538, y: 488, floor: 1, block: "C", type: "room", name: "G08" },
+  { id: "R1_sl", x: 538, y: 500, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "R1 left" },
+  { id: "R1_G10", x: 622, y: 460, floor: 1, block: "C", type: "room", name: "G10" },
+  { id: "R1_G11", x: 618, y: 490, floor: 1, block: "C", type: "room", name: "G11" },
 
-  // Corridor R1→R2 (more nodes + Water)
+  // Corridor R1→R2 + Water
   { id: "cM", x: 588, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cM2", x: 598, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cN", x: 608, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "R1R2_w", x: 610, y: 412, floor: 1, block: "C", type: "room", name: "Water", description: "drinking water" },
-  { id: "cN2", x: 618, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cO", x: 625, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cM2", x: 596, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cN", x: 604, y: 418, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "R1R2_w", x: 600, y: 412, floor: 1, block: "C", type: "room", name: "Water", description: "drinking water, R1-R2" },
+  { id: "cN2", x: 612, y: 415, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cO", x: 618, y: 412, floor: 1, block: "C", type: "corridor", name: "c" },
 
-  // ── R2 HEX (cx=640 cy=375 r=50) ──
-  { id: "R2t", x: 640, y: 335, floor: 1, block: "C", type: "intersection", name: "R2" },
-  { id: "R2b", x: 640, y: 412, floor: 1, block: "C", type: "intersection", name: "R2" },
-  { id: "R2_lc1", x: 618, y: 352, floor: 1, block: "C", type: "corridor", name: "R2" },
-  { id: "R2_lc2", x: 615, y: 375, floor: 1, block: "C", type: "corridor", name: "R2" },
-  { id: "R2_lc3", x: 618, y: 398, floor: 1, block: "C", type: "corridor", name: "R2" },
-  { id: "R2_rc1", x: 665, y: 352, floor: 1, block: "C", type: "corridor", name: "R2" },
-  { id: "R2_rc2", x: 668, y: 375, floor: 1, block: "C", type: "corridor", name: "R2" },
-  { id: "R2_rc3", x: 665, y: 398, floor: 1, block: "C", type: "corridor", name: "R2" },
-  { id: "C_G01", x: 665, y: 340, floor: 1, block: "C", type: "room", name: "G01" },
-  { id: "C_G03", x: 678, y: 370, floor: 1, block: "C", type: "room", name: "G03" },
-  { id: "C_G04", x: 668, y: 398, floor: 1, block: "C", type: "room", name: "G04" },
-  { id: "C_G10", x: 602, y: 375, floor: 1, block: "C", type: "room", name: "G10" },
-  { id: "R2_sl", x: 678, y: 358, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "right" },
+  // ── R2 HEX (rotated 45° CW, cx=640 cy=380 r=48) ──
+  { id: "R2t", x: 640, y: 340, floor: 1, block: "C", type: "intersection", name: "R2" },
+  { id: "R2b", x: 640, y: 420, floor: 1, block: "C", type: "intersection", name: "R2" },
+  { id: "R2_lc1", x: 615, y: 358, floor: 1, block: "C", type: "corridor", name: "R2" },
+  { id: "R2_lc2", x: 608, y: 380, floor: 1, block: "C", type: "corridor", name: "R2" },
+  { id: "R2_lc3", x: 615, y: 405, floor: 1, block: "C", type: "corridor", name: "R2" },
+  { id: "R2_rc1", x: 668, y: 355, floor: 1, block: "C", type: "corridor", name: "R2" },
+  { id: "R2_rc2", x: 675, y: 380, floor: 1, block: "C", type: "corridor", name: "R2" },
+  { id: "R2_rc3", x: 668, y: 405, floor: 1, block: "C", type: "corridor", name: "R2" },
+  { id: "R2_G03", x: 602, y: 365, floor: 1, block: "C", type: "room", name: "G03" },
+  { id: "R2_G04", x: 600, y: 398, floor: 1, block: "C", type: "room", name: "G04" },
+  { id: "R2_G05", x: 680, y: 365, floor: 1, block: "C", type: "room", name: "G05", description: "Electrical room" },
+  { id: "R2_G06", x: 675, y: 405, floor: 1, block: "C", type: "room", name: "G06" },
 
-  // Corridor R2→R3 (more nodes + Water)
-  { id: "cP", x: 645, y: 332, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cP2", x: 652, y: 330, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cQ", x: 660, y: 326, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "R2R3_w", x: 665, y: 320, floor: 1, block: "C", type: "room", name: "Water", description: "drinking water" },
-  { id: "cQ2", x: 670, y: 322, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "cR", x: 680, y: 320, floor: 1, block: "C", type: "corridor", name: "c" },
+  // Corridor R2→R3
+  { id: "cP", x: 648, y: 336, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cP2", x: 658, y: 328, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cQ", x: 668, y: 320, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cQ2", x: 678, y: 312, floor: 1, block: "C", type: "corridor", name: "c" },
+  { id: "cR", x: 688, y: 304, floor: 1, block: "C", type: "corridor", name: "c" },
 
-  // ── R3 HEX (cx=695 cy=290 r=35) ──
-  { id: "R3t", x: 695, y: 262, floor: 1, block: "C", type: "intersection", name: "R3" },
-  { id: "R3c", x: 695, y: 290, floor: 1, block: "C", type: "corridor", name: "R3" },
-  { id: "R3b", x: 695, y: 318, floor: 1, block: "C", type: "intersection", name: "R3" },
+  // ── R3 HEX (cx=700 cy=272 r=30, directly attached to A) ──
+  { id: "R3t", x: 700, y: 248, floor: 1, block: "C", type: "intersection", name: "R3" },
+  { id: "R3c", x: 700, y: 272, floor: 1, block: "C", type: "corridor", name: "R3" },
+  { id: "R3b", x: 700, y: 298, floor: 1, block: "C", type: "intersection", name: "R3" },
+  { id: "R3_G01", x: 722, y: 262, floor: 1, block: "C", type: "room", name: "G01", description: "Women's Washroom" },
+  { id: "R3_G02", x: 722, y: 278, floor: 1, block: "C", type: "room", name: "G02", description: "Men's Washroom" },
+  { id: "R3_sl", x: 722, y: 290, floor: 1, block: "C", type: "stairs", name: "Stairs/Lift", description: "below G02, A-C connector" },
 ]
+
+
 
 // ═══ D BLOCK (with stairs on path, lift behind) ═══
 const D_NODES: NavNode[] = [
@@ -335,22 +340,23 @@ export const navEdges: NavEdge[] = [
   { from:"A_mc3",to:"A_rc3",distance:30,floor:1,type:"corridor" },
   // Top cross connection
   { from:"A_lc1",to:"A_rc1",distance:100,floor:1,type:"corridor" },
-  // Entrances
+  // Entrances & top stairs
+  { from:"A_s1",to:"A_it",distance:8,floor:1,type:"corridor" },
   { from:"A1",to:"A_lc3",distance:8,floor:1,type:"corridor" },
   { from:"A2",to:"A_rc3",distance:8,floor:1,type:"corridor" },
-  // Left side services (no rooms)
-  { from:"A_s1",to:"A_it",distance:8,floor:1,type:"corridor" },
+  // Left side rooms (A1 side)
+  { from:"A_G49",to:"A_lc1",distance:8,floor:1,type:"corridor" },
+  { from:"A_G48",to:"A_lc1",distance:8,floor:1,type:"corridor" },
   { from:"A_sl_ul",to:"A_lc2",distance:8,floor:1,type:"corridor" },
+  { from:"A_G45",to:"A_lc4",distance:8,floor:1,type:"corridor" },
+  { from:"A_G44",to:"A_lc5",distance:8,floor:1,type:"corridor" },
   { from:"A_sl_ll",to:"A_lc4",distance:8,floor:1,type:"corridor" },
-  // Right side rooms (all on A2 side, top→bottom)
-  { from:"A_G49",to:"A_rc1",distance:8,floor:1,type:"corridor" },
-  { from:"A_G48",to:"A_rc1",distance:8,floor:1,type:"corridor" },
+  // Right side rooms (A2 side, top→bottom)
   { from:"A_G51",to:"A_rc2",distance:8,floor:1,type:"corridor" },
   { from:"A_G52",to:"A_rc3",distance:8,floor:1,type:"corridor" },
   { from:"A_G53",to:"A_rc4",distance:8,floor:1,type:"corridor" },
   { from:"A_G54",to:"A_rc5",distance:8,floor:1,type:"corridor" },
-  { from:"A_wr",to:"A_rc6",distance:8,floor:1,type:"corridor" },
-  // Sitting areas (DEAD-END — one connection only, never pass-through)
+  // Sitting areas (DEAD-END)
   { from:"A_sit1",to:"A_mc2",distance:15,floor:1,type:"corridor" },
   { from:"A_sit2",to:"A_mc2",distance:15,floor:1,type:"corridor" },
   // Bottom
@@ -361,6 +367,9 @@ export const navEdges: NavEdge[] = [
   { from:"C_entE",to:"L3t",distance:6,floor:1,type:"corridor" },
   { from:"L3t",to:"L3c",distance:28,floor:1,type:"corridor" },
   { from:"L3c",to:"L3b",distance:28,floor:1,type:"corridor" },
+  { from:"L3_wr_w",to:"L3c",distance:8,floor:1,type:"corridor" },
+  { from:"L3_wr_m",to:"L3c",distance:8,floor:1,type:"corridor" },
+  { from:"L3_sl",to:"L3c",distance:8,floor:1,type:"corridor" },
   // L3→L2 (smooth)
   ...[["L3b","cA"],["cA","cA2"],["cA2","cB"],["cB","cB2"],["cB2","cC"],["cC","L2t"]].map(
     ([a,b])=>({from:a,to:b,distance:8,floor:1,type:"corridor" as const})),
@@ -468,6 +477,9 @@ export const navEdges: NavEdge[] = [
   { from:"R3t",to:"R3c",distance:28,floor:1,type:"corridor" },
   { from:"R3c",to:"R3b",distance:28,floor:1,type:"corridor" },
   { from:"C_entA",to:"R3t",distance:6,floor:1,type:"corridor" },
+  { from:"R3_G01",to:"R3c",distance:8,floor:1,type:"corridor" },
+  { from:"R3_G02",to:"R3c",distance:8,floor:1,type:"corridor" },
+  { from:"R3_sl",to:"R3c",distance:8,floor:1,type:"corridor" },
   // Inter-block
   { from:"C_entE",to:"E_ib",distance:30,floor:1,type:"corridor" },
   { from:"C_entA",to:"A_ib",distance:30,floor:1,type:"corridor" },
