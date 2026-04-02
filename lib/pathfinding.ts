@@ -1,5 +1,5 @@
 import { navNodes, navEdges } from "./prp-navigation-graph"
-import type { NavNode } from "./prp-navigation-graph"
+import type { NavNode, NodeCategory } from "./prp-navigation-graph"
 
 export interface PathStep {
   nodeId: string
@@ -73,6 +73,68 @@ export function findShortestPath(startId: string, endId: string): Route | null {
         const neighbor = navNodes.find((n) => n.id === nid)
         if (!neighbor) continue
         openSet.set(nid, { nodeId: nid, gScore: tentG, fScore: tentG + heuristic(neighbor, endNode) })
+      }
+    }
+  }
+
+  return null
+}
+
+// ── Dijkstra nearest-facility search ──
+
+export function findNearestByCategory(
+  startId: string,
+  categories: NodeCategory[]
+): Route | null {
+  const startNode = navNodes.find((n) => n.id === startId)
+  if (!startNode) return null
+
+  // Target node IDs matching the categories
+  const targetIds = new Set(
+    navNodes
+      .filter((n) => {
+        const cat = n.category || ""
+        return categories.includes(cat as NodeCategory)
+      })
+      .map((n) => n.id)
+  )
+  if (targetIds.size === 0) return null
+
+  // Dijkstra from startId
+  const dist = new Map<string, number>()
+  const prev = new Map<string, string>()
+  const visited = new Set<string>()
+  dist.set(startId, 0)
+
+  // Simple priority queue via sorted array
+  const queue: { id: string; d: number }[] = [{ id: startId, d: 0 }]
+
+  while (queue.length > 0) {
+    queue.sort((a, b) => a.d - b.d)
+    const { id: uid } = queue.shift()!
+    if (visited.has(uid)) continue
+    visited.add(uid)
+
+    // Found a target!
+    if (targetIds.has(uid) && uid !== startId) {
+      const path: string[] = [uid]
+      let cid = uid
+      while (prev.has(cid)) {
+        cid = prev.get(cid)!
+        path.unshift(cid)
+      }
+      return buildRoute(path)
+    }
+
+    const edges = navEdges.filter((e) => e.from === uid || e.to === uid)
+    for (const edge of edges) {
+      const vid = edge.from === uid ? edge.to : edge.from
+      if (visited.has(vid)) continue
+      const alt = (dist.get(uid) ?? Infinity) + edge.distance
+      if (alt < (dist.get(vid) ?? Infinity)) {
+        dist.set(vid, alt)
+        prev.set(vid, uid)
+        queue.push({ id: vid, d: alt })
       }
     }
   }

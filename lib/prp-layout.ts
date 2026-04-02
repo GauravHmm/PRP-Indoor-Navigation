@@ -62,13 +62,13 @@ export const C_SHAPES: SubShapeDef[] = [
   // R3 (directly attached to A, cx=700 cy=272 r=30)
   { id: "C_R3", polygon: "700,242 726,257 726,287 700,302 674,287 674,257" },
 
-  // Corridor passages (wider ~24px trapezoids)
-  { id: "C_cL3L2", polygon: "290,298 310,298 365,330 340,340" },
-  { id: "C_cL2L1", polygon: "385,418 400,418 430,430 415,435" },
-  { id: "C_cL1DI", polygon: "410,518 430,518 445,528 425,528" },
-  { id: "C_cR3R2", polygon: "690,298 710,298 670,340 645,330" },
-  { id: "C_cR2R1", polygon: "600,416 615,418 575,435 565,430" },
-  { id: "C_cR1DI", polygon: "570,528 555,528 570,518 590,518" },
+  // Corridor passages — straight rectangular connectors (24px wide)
+  { id: "C_cR3R2", polygon: "686,296 700,296 652,338 638,338" },
+  { id: "C_cR2R1", polygon: "622,412 636,412 592,420 578,420" },
+  { id: "C_cR1DI", polygon: "576,510 562,510 558,527 572,527" },
+  { id: "C_cL3L2", polygon: "302,296 316,296 348,338 334,338" },
+  { id: "C_cL2L1", polygon: "378,412 364,412 408,420 422,420" },
+  { id: "C_cL1DI", polygon: "424,510 438,510 442,527 428,527" },
 ]
 
 export const C_FILL = "#dbeafe"
