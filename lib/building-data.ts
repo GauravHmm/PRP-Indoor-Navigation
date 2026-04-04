@@ -1,12 +1,11 @@
 // ============================================================
 // PRP Building — Data Interfaces & Utilities
-// Category-aware search + nearest facility support
+// Re-exports node/edge data from the navigation graph
 // ============================================================
 
-export type { NavNode, NavEdge, NodeCategory } from "./prp-navigation-graph"
+// Re-export types and data from the navigation graph
+export type { NavNode, NavEdge } from "./prp-navigation-graph"
 export { navNodes, navEdges } from "./prp-navigation-graph"
-import { navNodes } from "./prp-navigation-graph"
-import type { NavNode, NodeCategory } from "./prp-navigation-graph"
 
 export interface Room {
   id: string
@@ -19,6 +18,9 @@ export interface Room {
   description?: string
 }
 
+// Build rooms list from navNodes (only navigable destinations)
+import { navNodes } from "./prp-navigation-graph"
+
 const NAVIGABLE_TYPES = new Set(["room", "entrance", "stairs", "elevator"])
 
 export const rooms: Room[] = navNodes
@@ -30,69 +32,9 @@ export const rooms: Room[] = navNodes
     block: n.block,
     x: n.x,
     y: n.y,
-    category: n.category || deriveCategory(n),
+    category: n.category ?? n.type,
     description: n.description,
   }))
-
-// ── Category derivation (fallback when category not set) ──
-
-function deriveCategory(n: NavNode): string {
-  if (n.type === "stairs") return "stairs"
-  if (n.type === "elevator") return "lift"
-  const lower = `${n.name} ${n.description || ""}`.toLowerCase()
-  if (lower.includes("water") || lower.includes("drinking")) return "water"
-  if (lower.includes("women") || lower.includes("female")) return "washroom_female"
-  if (lower.includes("men") || lower.includes("male")) return "washroom_male"
-  if (lower.includes("washroom") || lower.includes("wr")) return "washroom_male"
-  if (lower.includes("sitting")) return "sitting"
-  if (lower.includes("lab")) return "lab"
-  if (lower.includes("canteen")) return "canteen"
-  if (lower.includes("office") || lower.includes("faculty") || lower.includes("cabin")) return "office"
-  if (lower.includes("electrical")) return "electrical"
-  if (lower.includes("stationary") || lower.includes("stationery")) return "stationary"
-  return "general"
-}
-
-// ── Category keyword map for search ──
-
-const CATEGORY_KEYWORDS: Record<string, NodeCategory[]> = {
-  water: ["water"],
-  drinking: ["water"],
-  washroom: ["washroom_male", "washroom_female"],
-  bathroom: ["washroom_male", "washroom_female"],
-  toilet: ["washroom_male", "washroom_female"],
-  "men's washroom": ["washroom_male"],
-  "women's washroom": ["washroom_female"],
-  sitting: ["sitting"],
-  "sitting area": ["sitting"],
-  lab: ["lab"],
-  canteen: ["canteen"],
-  food: ["canteen"],
-  stairs: ["stairs"],
-  lift: ["lift"],
-  elevator: ["lift"],
-  electrical: ["electrical"],
-  stationary: ["stationary"],
-  stationery: ["stationary"],
-  office: ["office"],
-  faculty: ["office"],
-}
-
-/** Check if a query matches a facility category */
-export function matchCategory(query: string): NodeCategory[] | null {
-  const q = query.toLowerCase().trim()
-  for (const [keyword, cats] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (q === keyword || q.includes(keyword)) return cats
-  }
-  return null
-}
-
-/** Get all rooms matching specific categories */
-export function getRoomsByCategory(categories: NodeCategory[]): Room[] {
-  return rooms.filter((r) => categories.includes(r.category as NodeCategory))
-}
-
-// ── Standard search functions ──
 
 export function getAllRooms(): Room[] {
   return rooms
@@ -108,18 +50,94 @@ export function searchRooms(query: string): Room[] {
     (r) =>
       r.name.toLowerCase().includes(lowerQuery) ||
       r.block.toLowerCase().includes(lowerQuery) ||
-      r.category.toLowerCase().includes(lowerQuery) ||
-      (r.description?.toLowerCase().includes(lowerQuery) ?? false),
+      (r.description?.toLowerCase().includes(lowerQuery) ?? false) ||
+      r.category.toLowerCase().includes(lowerQuery),
   )
 }
 
-/** Get nearest node to given SVG coordinates */
-export function getNearestNodeFromCoordinates(x: number, y: number): NavNode | null {
-  let best: NavNode | null = null
-  let bestDist = Infinity
-  for (const n of navNodes) {
-    const d = Math.hypot(n.x - x, n.y - y)
-    if (d < bestDist) { bestDist = d; best = n }
+// ── Category system ──────────────────────────────────────────
+
+export const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
+  water:            { label: "Water",            icon: "💧" },
+  washroom_male:    { label: "Men's Washroom",   icon: "🚹" },
+  washroom_female:  { label: "Women's Washroom", icon: "🚺" },
+  sitting:          { label: "Sitting Area",     icon: "🪑" },
+  stairs:           { label: "Stairs",           icon: "🪜" },
+  lift:             { label: "Lift",             icon: "🛗" },
+  lab:              { label: "Lab",              icon: "🔬" },
+  electrical:       { label: "Electrical Room",  icon: "⚡" },
+  stationary:       { label: "Stationary",       icon: "📎" },
+  canteen:          { label: "Canteen",          icon: "🍽️" },
+  office:           { label: "Office",           icon: "🏢" },
+  room:             { label: "Room",             icon: "🏫" },
+  entrance:         { label: "Entrance",         icon: "🚪" },
+}
+
+// Quick-action categories (shown as buttons in the UI)
+export const QUICK_CATEGORIES = [
+  "water", "washroom_male", "washroom_female", "sitting", "canteen", "stairs", "lift",
+] as const
+
+// Keyword → category mapping for natural language search
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  water:           ["water", "drinking", "drink"],
+  washroom_male:   ["men washroom", "men's washroom", "male washroom", "gents"],
+  washroom_female: ["women washroom", "women's washroom", "female washroom", "ladies"],
+  sitting:         ["sitting", "sit", "seat", "rest"],
+  stairs:          ["stairs", "staircase", "stairway"],
+  lift:            ["lift", "elevator"],
+  lab:             ["lab", "laboratory"],
+  electrical:      ["electrical", "electric"],
+  stationary:      ["stationary", "stationery"],
+  canteen:         ["canteen", "cafeteria", "food", "eat"],
+  office:          ["office", "faculty", "cabin"],
+}
+
+// Broad aliases that match multiple categories
+const BROAD_ALIASES: Record<string, string[]> = {
+  washroom:  ["washroom_male", "washroom_female"],
+  toilet:    ["washroom_male", "washroom_female"],
+  restroom:  ["washroom_male", "washroom_female"],
+  wr:        ["washroom_male", "washroom_female"],
+}
+
+/**
+ * Match a search query to a single category.
+ * Returns null if no category matches — caller should fall back to text search.
+ */
+export function matchCategory(query: string): string | null {
+  const lower = query.toLowerCase().trim()
+
+  // Exact broad aliases first
+  for (const [alias, _cats] of Object.entries(BROAD_ALIASES)) {
+    if (lower === alias || lower.includes(alias)) {
+      // Return the first matching category (UI can handle both)
+      return _cats[0]
+    }
   }
-  return best
+
+  // Specific keyword matching
+  for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (keywords.some((k) => lower.includes(k) || k.includes(lower))) {
+      return cat
+    }
+  }
+
+  return null
+}
+
+/**
+ * Get all categories that a broad query might match (e.g. "washroom" → male + female)
+ */
+export function matchBroadCategories(query: string): string[] {
+  const lower = query.toLowerCase().trim()
+
+  for (const [alias, cats] of Object.entries(BROAD_ALIASES)) {
+    if (lower === alias || lower.includes(alias)) {
+      return cats
+    }
+  }
+
+  const single = matchCategory(query)
+  return single ? [single] : []
 }

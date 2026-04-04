@@ -1,5 +1,5 @@
 import { navNodes, navEdges } from "./prp-navigation-graph"
-import type { NavNode, NodeCategory } from "./prp-navigation-graph"
+import type { NavNode } from "./prp-navigation-graph"
 
 export interface PathStep {
   nodeId: string
@@ -80,68 +80,6 @@ export function findShortestPath(startId: string, endId: string): Route | null {
   return null
 }
 
-// ── Dijkstra nearest-facility search ──
-
-export function findNearestByCategory(
-  startId: string,
-  categories: NodeCategory[]
-): Route | null {
-  const startNode = navNodes.find((n) => n.id === startId)
-  if (!startNode) return null
-
-  // Target node IDs matching the categories
-  const targetIds = new Set(
-    navNodes
-      .filter((n) => {
-        const cat = n.category || ""
-        return categories.includes(cat as NodeCategory)
-      })
-      .map((n) => n.id)
-  )
-  if (targetIds.size === 0) return null
-
-  // Dijkstra from startId
-  const dist = new Map<string, number>()
-  const prev = new Map<string, string>()
-  const visited = new Set<string>()
-  dist.set(startId, 0)
-
-  // Simple priority queue via sorted array
-  const queue: { id: string; d: number }[] = [{ id: startId, d: 0 }]
-
-  while (queue.length > 0) {
-    queue.sort((a, b) => a.d - b.d)
-    const { id: uid } = queue.shift()!
-    if (visited.has(uid)) continue
-    visited.add(uid)
-
-    // Found a target!
-    if (targetIds.has(uid) && uid !== startId) {
-      const path: string[] = [uid]
-      let cid = uid
-      while (prev.has(cid)) {
-        cid = prev.get(cid)!
-        path.unshift(cid)
-      }
-      return buildRoute(path)
-    }
-
-    const edges = navEdges.filter((e) => e.from === uid || e.to === uid)
-    for (const edge of edges) {
-      const vid = edge.from === uid ? edge.to : edge.from
-      if (visited.has(vid)) continue
-      const alt = (dist.get(uid) ?? Infinity) + edge.distance
-      if (alt < (dist.get(vid) ?? Infinity)) {
-        dist.set(vid, alt)
-        prev.set(vid, uid)
-        queue.push({ id: vid, d: alt })
-      }
-    }
-  }
-
-  return null
-}
-
 function buildRoute(path: string[]): Route {
   let totalDistance = 0
   let prevFloor = -1
@@ -186,4 +124,99 @@ function makeInstruction(node: NavNode, idx: number, total: number): string {
     case "corridor": return `Walk along ${node.name}`
     default: return `Proceed towards ${node.name}`
   }
+}
+
+// ── Dijkstra: find nearest node matching a category ──────────
+
+export function findNearestByCategory(
+  startId: string,
+  category: string
+): Route | null {
+  const startNode = navNodes.find((n) => n.id === startId)
+  if (!startNode) return null
+
+  const dist = new Map<string, number>()
+  const prev = new Map<string, string>()
+  const visited = new Set<string>()
+  const queue: { id: string; d: number }[] = [{ id: startId, d: 0 }]
+  dist.set(startId, 0)
+
+  while (queue.length > 0) {
+    queue.sort((a, b) => a.d - b.d)
+    const { id: currId, d: currDist } = queue.shift()!
+
+    if (visited.has(currId)) continue
+    visited.add(currId)
+
+    const currNode = navNodes.find((n) => n.id === currId)
+    if (!currNode) continue
+
+    // Found a target?
+    if (currId !== startId && currNode.category === category) {
+      const path: string[] = [currId]
+      let cid = currId
+      while (prev.has(cid)) {
+        cid = prev.get(cid)!
+        path.unshift(cid)
+      }
+      return buildRoute(path)
+    }
+
+    // Expand neighbors
+    const edges = navEdges.filter(
+      (e) => e.from === currId || e.to === currId
+    )
+    for (const edge of edges) {
+      const nid = edge.from === currId ? edge.to : edge.from
+      if (visited.has(nid)) continue
+      const newDist = currDist + edge.distance
+      if (newDist < (dist.get(nid) ?? Infinity)) {
+        dist.set(nid, newDist)
+        prev.set(nid, currId)
+        queue.push({ id: nid, d: newDist })
+      }
+    }
+  }
+
+  return null
+}
+
+// ── Find all nodes of a given category (sorted by distance) ──
+
+export function findAllByCategory(
+  startId: string,
+  category: string
+): { node: NavNode; route: Route }[] {
+  const targets = navNodes.filter((n) => n.category === category)
+  const results: { node: NavNode; route: Route }[] = []
+
+  for (const target of targets) {
+    const route = findShortestPath(startId, target.id)
+    if (route) results.push({ node: target, route })
+  }
+
+  results.sort((a, b) => a.route.totalDistance - b.route.totalDistance)
+  return results
+}
+
+// ── Get nearest graph node from raw (x, y) coordinates ──────
+
+export function getNearestNodeFromCoordinates(
+  x: number,
+  y: number
+): NavNode | null {
+  let best: NavNode | null = null
+  let bestDist = Infinity
+
+  for (const node of navNodes) {
+    const dx = node.x - x
+    const dy = node.y - y
+    const d = dx * dx + dy * dy
+    if (d < bestDist) {
+      bestDist = d
+      best = node
+    }
+  }
+
+  return best
 }
