@@ -41,13 +41,13 @@ export function NavigationPanel({
   }, [])
 
   const startResults = useMemo(() => {
-    if (!startQuery) return getAllRooms().slice(0, 5)
-    return searchRooms(startQuery).slice(0, 8)
+    if (!startQuery) return getAllRooms().slice(0, 15)
+    return searchRooms(startQuery).slice(0, 25)
   }, [startQuery])
 
   const endResults = useMemo(() => {
-    if (!endQuery) return getAllRooms().slice(0, 5)
-    return searchRooms(endQuery).slice(0, 8)
+    if (!endQuery) return getAllRooms().slice(0, 15)
+    return searchRooms(endQuery).slice(0, 25)
   }, [endQuery])
 
   // Group results by category for display

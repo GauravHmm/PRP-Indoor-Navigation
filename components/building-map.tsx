@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useMemo } from "react"
 import type { PathStep } from "@/lib/pathfinding"
 import { navNodes } from "@/lib/prp-navigation-graph"
+import { FLOOR_LABELS } from "@/lib/prp-navigation-graph"
 import { BLOCKS, CONNECTORS, C_SHAPES, C_FILL, C_STROKE, C_HEXAGONS, hexPoints, NODE_COLORS } from "@/lib/prp-layout"
 import { buildSvgPath } from "@/lib/path-utils"
 
@@ -15,16 +16,17 @@ interface BuildingMapProps {
 
 interface Camera { x: number; y: number; zoom: number }
 
-const W = 1000, H = 800, MIN_Z = 0.8, MAX_Z = 5
+const W = 1000, H = 900, MIN_Z = 0.8, MAX_Z = 5
 
 export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, selectedEnd }: BuildingMapProps) {
   const [cam, setCam] = useState<Camera>({ x: 0, y: 0, zoom: 1 })
   const [drag, setDrag] = useState(false)
   const [dStart, setDStart] = useState({ x: 0, y: 0 })
+  const [floor, setFloor] = useState(startFloor)
   const svgRef = useRef<SVGSVGElement>(null)
 
   // Content bounds (where the building shapes live)
-  const CX_MIN = 100, CX_MAX = 900, CY_MIN = 0, CY_MAX = 780
+  const CX_MIN = 100, CX_MAX = 900, CY_MIN = 0, CY_MAX = 860
 
   // Clamp camera so content stays visible
   const clampCam = useCallback((c: Camera): Camera => {
@@ -64,7 +66,7 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
   }, [clampCam])
 
   const routePts = useMemo(() => highlightedPath?.map(s => ({ x: s.x, y: s.y })) ?? [], [highlightedPath])
-  const nodes = useMemo(() => navNodes.filter(n => n.floor === startFloor), [startFloor])
+  const nodes = useMemo(() => navNodes.filter(n => n.floor === floor), [floor])
 
   // Zoom targets: include C block center
   const allZoomTargets = [
@@ -79,6 +81,19 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
         <div className="flex gap-2 items-center">
           <button onClick={reset} className="px-4 py-2 bg-slate-700 text-slate-200 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors">Reset View</button>
           <span className="text-slate-400 text-sm">{Math.round(cam.zoom * 100)}%</span>
+        </div>
+        {/* Floor selector */}
+        <div className="flex gap-1 items-center bg-slate-800 rounded-lg p-1">
+          {Object.entries(FLOOR_LABELS).map(([f, label]) => (
+            <button key={f} onClick={() => setFloor(Number(f))}
+              className={`px-3 py-1.5 text-xs rounded-md font-semibold transition-all ${
+                floor === Number(f)
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-700"
+              }`}>
+              {label}
+            </button>
+          ))}
         </div>
         <div className="flex gap-1 flex-wrap">
           {allZoomTargets.map(b => (
@@ -99,15 +114,21 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
           onWheel={onWheel} onMouseDown={onDown} onMouseMove={onMove} onMouseUp={onUp} onMouseLeave={onUp}>
 
           {/* Background */}
-          <rect x="-300" y="-300" width="1600" height="1400" fill="#0f172a" />
+          <rect x="-300" y="-300" width="1600" height="1600" fill="#0f172a" />
 
           {/* Layer 1: Connector shapes */}
           {CONNECTORS.map(c => (
             <polygon key={c.id} points={c.polygon} fill={c.fill} stroke="none" opacity="0.6" />
           ))}
 
-          {/* Layer 2a: C Block sub-shapes (hexagons, diamond, corridors) */}
-          {C_SHAPES.map(s => (
+          {/* Layer 2a: Corridor shapes (BEHIND hexagons — overlap hidden by hex on top) */}
+          {C_SHAPES.filter(s => s.id.startsWith("C_c")).map(s => (
+            <polygon key={s.id} points={s.polygon} fill={C_FILL} stroke={C_STROKE}
+              strokeWidth="1.5" opacity="0.85" />
+          ))}
+
+          {/* Layer 2b: Hex shapes (ON TOP — hides corridor overlap for clean joins) */}
+          {C_SHAPES.filter(s => !s.id.startsWith("C_c")).map(s => (
             <polygon key={s.id} points={s.polygon} fill={C_FILL} stroke={C_STROKE}
               strokeWidth="2" opacity="0.9"
               onClick={() => zoomTo(500, 380)}
@@ -115,7 +136,7 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
           ))}
 
           {/* C Block label */}
-          <text x="500" y="530" textAnchor="middle" dominantBaseline="middle"
+          <text x="500" y="610" textAnchor="middle" dominantBaseline="middle"
             fill={C_STROKE} fontSize="12" fontWeight="700" className="pointer-events-none">
             Block C
           </text>
@@ -141,13 +162,27 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
 
           {/* Layer 4: Corridor spine lines */}
           <g stroke="#94a3b8" strokeWidth="1" opacity="0.25" strokeDasharray="4 3">
-            <line x1="250" y1="70" x2="250" y2="245" />
-            <line x1="750" y1="70" x2="750" y2="245" />
-            <polyline points="305,260 305,320 360,338 360,415 420,425 420,510 440,525 500,525" fill="none" />
-            <polyline points="695,260 695,320 640,338 640,415 580,425 580,510 560,525 500,525" fill="none" />
-            <line x1="500" y1="525" x2="500" y2="600" />
-            <line x1="440" y1="575" x2="375" y2="660" />
-            <line x1="560" y1="575" x2="625" y2="660" />
+            {/* E/A block vertical spines */}
+            <line x1="250" y1="70" x2="250" y2="235" />
+            <line x1="750" y1="70" x2="750" y2="235" />
+            {/* Courtyard vertical */}
+            <line x1="500" y1="80" x2="500" y2="608" />
+            {/* E1 → A1 horizontal */}
+            <line x1="315" y1="152" x2="685" y2="152" />
+            {/* E→C connector */}
+            <polyline points="250,235 260,243 278,248 300,252" fill="none" />
+            {/* Left arm: L3→L2→L1→Gem (shifted) */}
+            <polyline points="300,252 300,298 326,318 360,340 360,426 420,453 420,563 445,605 500,610" fill="none" />
+            {/* A→C connector */}
+            <polyline points="750,235 740,243 722,248 700,252" fill="none" />
+            {/* Right arm: R3→R2→R1→Gem (shifted) */}
+            <polyline points="700,252 700,298 674,318 640,340 640,426 580,453 580,563 555,605 500,610" fill="none" />
+            {/* Gem vertical spine */}
+            <line x1="500" y1="610" x2="500" y2="675" />
+            {/* C→D connector (shifted +80) */}
+            <polyline points="445,625 442,652 425,680 408,705 390,730 375,740" fill="none" />
+            {/* C→B connector (shifted +80) */}
+            <polyline points="555,625 558,652 578,680 598,705 615,730 640,740" fill="none" />
           </g>
 
           {/* Layer 5: Route path */}

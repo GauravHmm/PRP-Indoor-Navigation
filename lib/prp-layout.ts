@@ -1,7 +1,7 @@
 // ============================================================
 // PRP Building — Spatial Layout Layer
-// C-block = 3 hexagons per side + center gem shape
-// Hexagons ENLARGED to ensure all nodes fit inside
+// Hexagons SPACED OUT with clear corridor gaps between them
+// L1/R1: +40px, Gem/D/B: +80px vertical shift
 // ============================================================
 
 export interface BlockDef {
@@ -27,48 +27,54 @@ export const BLOCKS: BlockDef[] = [
     labelX: 750, labelY: 150, fill: "#dcfce7", stroke: "#16a34a",
   },
   {
-    id: "D", name: "Block D", cx: 340, cy: 700,
-    polygon: "295,655 385,655 385,745 295,745",
-    labelX: 340, labelY: 700, fill: "#fef3c7", stroke: "#d97706", rotation: 45
+    id: "D", name: "Block D", cx: 340, cy: 780,
+    polygon: "295,735 385,735 385,825 295,825",
+    labelX: 340, labelY: 780, fill: "#fef3c7", stroke: "#d97706", rotation: 45
   },
   {
-    id: "B", name: "Block B", cx: 660, cy: 700,
-    polygon: "615,655 705,655 705,745 615,745",
-    labelX: 660, labelY: 700, fill: "#fef3c7", stroke: "#d97706", rotation: -45
+    id: "B", name: "Block B", cx: 660, cy: 780,
+    polygon: "615,735 705,735 705,825 615,825",
+    labelX: 660, labelY: 780, fill: "#fef3c7", stroke: "#d97706", rotation: -45
   }
 ]
 
 // ── C BLOCK SUB-SHAPES ──────────────────────────────────────
-// L3/R3: directly attached to E/A blocks (connector hexes)
-// L2/R2: rotated 45° inward per sketch
-// L1/R1: standard pointy-top hexes
-// GEM: pentagon center
+// L3/R3: no shift (attached to E/A)
+// L2/R2: no shift
+// L1/R1: +40px vertical
+// GEM: +80px vertical
 
 export const C_SHAPES: SubShapeDef[] = [
-  // L3 (directly attached to E, cx=300 cy=272 r=30)
+  // L3 (cx=300 cy=272 r=30) — no shift
   { id: "C_L3", polygon: "300,242 326,257 326,287 300,302 274,287 274,257" },
-  // L2 (rotated -45° counter-clockwise, cx=360 cy=380 r=48)
+  // L2 (rotated -45°, cx=360 cy=380 r=48) — no shift
   { id: "C_L2", polygon: "326,346 372,334 406,368 394,414 348,426 314,392" },
-  // L1 (cx=420 cy=468 r=55): standard
-  { id: "C_L1", polygon: "420,413 468,441 468,496 420,523 372,496 372,441" },
+  // L1 (cx=420 cy=508 r=55) — shifted +40
+  { id: "C_L1", polygon: "420,453 468,481 468,536 420,563 372,536 372,481" },
 
-  // GEM center
-  { id: "C_DI", polygon: "440,525 560,525 565,565 500,600 435,565" },
+  // GEM center — shifted +80
+  { id: "C_DI", polygon: "440,605 560,605 565,645 500,680 435,645" },
 
-  // R1 (cx=580 cy=468 r=55): standard
-  { id: "C_R1", polygon: "580,413 628,441 628,496 580,523 532,496 532,441" },
-  // R2 (rotated 45° clockwise, cx=640 cy=380 r=48)
+  // R1 (cx=580 cy=508 r=55) — shifted +40
+  { id: "C_R1", polygon: "580,453 628,481 628,536 580,563 532,536 532,481" },
+  // R2 (rotated 45° CW, cx=640 cy=380 r=48) — no shift
   { id: "C_R2", polygon: "674,346 686,392 652,426 606,414 594,368 628,334" },
-  // R3 (directly attached to A, cx=700 cy=272 r=30)
+  // R3 (cx=700 cy=272 r=30) — no shift
   { id: "C_R3", polygon: "700,242 726,257 726,287 700,302 674,287 674,257" },
 
-  // Corridor passages (wider ~24px trapezoids)
-  { id: "C_cL3L2", polygon: "290,298 310,298 365,330 340,340" },
-  { id: "C_cL2L1", polygon: "385,418 400,418 430,430 415,435" },
-  { id: "C_cL1DI", polygon: "410,518 430,518 445,528 425,528" },
-  { id: "C_cR3R2", polygon: "690,298 710,298 670,340 645,330" },
-  { id: "C_cR2R1", polygon: "600,416 615,418 575,435 565,430" },
-  { id: "C_cR1DI", polygon: "570,528 555,528 570,518 590,518" },
+  // Corridor passages — extend INTO hexes on both ends (hex overlay hides overlap)
+  // L3(300,290) → L2(350,345)
+  { id: "C_cL3L2", polygon: "311,280 289,300 339,355 361,335" },
+  // L2(360,415) → L1(420,460)
+  { id: "C_cL2L1", polygon: "369,403 351,427 411,472 429,448" },
+  // L1(420,555) → Gem(445,610)
+  { id: "C_cL1DI", polygon: "434,549 406,561 431,616 459,604" },
+  // R3(700,290) → R2(650,345)
+  { id: "C_cR3R2", polygon: "689,280 711,300 661,355 639,335" },
+  // R2(640,415) → R1(580,460)
+  { id: "C_cR2R1", polygon: "631,403 649,427 589,472 571,448" },
+  // R1(580,555) → Gem(555,610)
+  { id: "C_cR1DI", polygon: "566,549 594,561 569,616 541,604" },
 ]
 
 export const C_FILL = "#dbeafe"
@@ -77,25 +83,25 @@ export const C_STROKE = "#2563eb"
 // ── CONNECTORS ──────────────────────────────────────────────
 
 export const CONNECTORS: ConnectorDef[] = [
-  // E bottom → L3 top (directly attached, seamless bridge)
+  // E bottom → L3 top (no shift)
   { id: "conn_E_C", polygon: "235,245 265,245 326,255 274,255", fill: "#d4dff7" },
-  // A bottom → R3 top (directly attached, seamless bridge)
+  // A bottom → R3 top (no shift)
   { id: "conn_A_C", polygon: "735,245 765,245 726,255 674,255", fill: "#d4dff7" },
-  // Gem lower-left → D
-  { id: "conn_C_D", polygon: "438,562 448,572 375,660 360,645", fill: "#e8dfc7" },
-  // Gem lower-right → B
-  { id: "conn_C_B", polygon: "552,572 562,562 640,645 625,660", fill: "#e8dfc7" },
+  // Gem lower-left → D (shifted +80)
+  { id: "conn_C_D", polygon: "438,642 448,652 375,740 360,725", fill: "#e8dfc7" },
+  // Gem lower-right → B (shifted +80)
+  { id: "conn_C_B", polygon: "552,652 562,642 640,725 625,740", fill: "#e8dfc7" },
 ]
 
 // ── DECORATIVE INNER HEXAGONS ───────────────────────────────
 
 export const C_HEXAGONS: HexDef[] = [
-  { cx: 300, cy: 272, r: 16 },
-  { cx: 360, cy: 380, r: 22 },
-  { cx: 420, cy: 468, r: 26 },
-  { cx: 580, cy: 468, r: 26 },
-  { cx: 640, cy: 380, r: 22 },
-  { cx: 700, cy: 272, r: 16 },
+  { cx: 300, cy: 272, r: 16 },   // L3 — no shift
+  { cx: 360, cy: 380, r: 22 },   // L2 — no shift
+  { cx: 420, cy: 508, r: 26 },   // L1 — +40
+  { cx: 580, cy: 508, r: 26 },   // R1 — +40
+  { cx: 640, cy: 380, r: 22 },   // R2 — no shift
+  { cx: 700, cy: 272, r: 16 },   // R3 — no shift
 ]
 
 export function hexPoints(cx: number, cy: number, r: number): string {
