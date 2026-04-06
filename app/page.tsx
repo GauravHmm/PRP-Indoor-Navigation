@@ -1,9 +1,13 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight, MapPin, Zap, Search, Navigation, Layers, Building2 } from "lucide-react"
+import { CustomCursor } from "@/components/custom-cursor"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen animate-gradient-bg text-slate-100">
+      <CustomCursor />
       {/* ── Navbar ──────────────────────────────────── */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-[#0f172a]/80 border-b border-slate-700/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">

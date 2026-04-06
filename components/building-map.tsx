@@ -314,22 +314,15 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
             const isCorridor = n.type === "corridor" || n.type === "intersection"
             const isTransition = transitionNodeIds.has(n.id)
 
-            // ── Progressive zoom-based visibility ──
-            // Always show: start, end, path nodes
-            // Zoom < 1.5: hide everything else (clean overview)
-            // Zoom 1.5-2.2: show rooms and infrastructure
-            // Zoom > 2.2: show corridors and intersections too
-            if (!isSt && !isEn && !onPath) {
-              if (cam.zoom < 1.5) return null
-              if (isCorridor && cam.zoom < 2.2) return null
-            }
+            // Visibility: corridors hidden at low zoom unless on path
+            // Rooms and infra are ALWAYS visible
+            if (isCorridor && !isSt && !isEn && !onPath && cam.zoom < 1.8) return null
 
-            // ── Node sizing ──
-            // Start/end: large; rooms/infra: medium; on-path corridor: tiny; others: small
-            let r = 2.5
+            // Node sizing
+            let r = 2
             if (isSt) r = 7
             else if (isEn) r = 6
-            else if (onPath && isCorridor) r = 1.5 // tiny dots on path for corridors
+            else if (onPath && isCorridor) r = 1.5
             else if (isInfra) r = 3.5
             else if (isRoom) r = 3
 
@@ -392,8 +385,8 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
                   opacity={opacity}
                   className="transition-all duration-200" />
 
-                {/* Node label (zoomed in, rooms/infra only) */}
-                {cam.zoom >= 2.2 && (isRoom || isInfra) && (
+                {/* Node label */}
+                {cam.zoom >= 1.8 && (isRoom || isInfra) && (
                   <text x={n.x} y={n.y - r - 3} textAnchor="middle" fill="#e2e8f0"
                     fontSize="5" fontWeight="600" className="pointer-events-none" opacity="0.8">{n.name}</text>
                 )}

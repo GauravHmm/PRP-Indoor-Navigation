@@ -1,552 +1,590 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gaurav — Indoor Navigation System Portfolio</title>
-  <meta name="description" content="Portfolio showcasing an intelligent indoor navigation system for academic buildings with smart routing and multi-floor support." />
+  <title>Gauravsingh Rajpurohit — Developer Portfolio</title>
+  <meta name="description"
+    content="Portfolio of Gauravsing Rajpurohit — full-stack developer, indoor navigation systems, and web applications." />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
   <style>
-    /* ══════════════════════════════════════════════
-       RESET & BASE
-       ══════════════════════════════════════════════ */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     :root {
       --bg: #0f172a;
-      --panel: #1e293b;
-      --panel-light: #334155;
+      --surface: rgba(30, 41, 59, 0.6);
+      --surface-solid: #1e293b;
       --primary: #22d3ee;
       --accent: #10b981;
-      --warning: #facc15;
-      --danger: #ef4444;
       --text: #f1f5f9;
       --text-muted: #94a3b8;
-      --border: #334155;
+      --text-dim: #64748b;
+      --border: rgba(51, 65, 85, 0.5);
     }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       color: var(--text);
       background: var(--bg);
-      overflow-x: hidden;
+      line-height: 1.6;
       cursor: none;
+      overflow-x: hidden;
     }
 
-    /* ══════════════════════════════════════════════
-       CUSTOM CURSOR
-       ══════════════════════════════════════════════ */
+    /* ── Dual-layer Cursor ── */
     .cursor-dot {
       position: fixed;
-      top: 0; left: 0;
-      width: 8px; height: 8px;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 6px;
       background: var(--primary);
       border-radius: 50%;
       pointer-events: none;
       z-index: 9999;
-      transition: width 0.2s ease, height 0.2s ease, background 0.2s ease, transform 0.2s ease;
       transform: translate(-50%, -50%);
-    }
-    .cursor-dot.expanded {
-      width: 32px; height: 32px;
-      background: rgba(34, 211, 238, 0.15);
-      border: 2px solid var(--primary);
+      transition: background 0.2s;
     }
 
-    /* ══════════════════════════════════════════════
-       ANIMATED GRADIENT BACKGROUND
-       ══════════════════════════════════════════════ */
-    .gradient-bg {
+    .cursor-ring {
       position: fixed;
-      inset: 0;
-      z-index: -1;
-      background: linear-gradient(-45deg, #0f172a 0%, #1e293b 25%, #0f172a 50%, #162033 75%, #0f172a 100%);
-      background-size: 400% 400%;
-      animation: gradientShift 15s ease infinite;
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Subtle grid overlay */
-    .grid-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background-image:
-        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-    }
-
-    /* ══════════════════════════════════════════════
-       NAVBAR
-       ══════════════════════════════════════════════ */
-    .navbar {
-      position: sticky;
       top: 0;
-      z-index: 100;
+      left: 0;
+      width: 24px;
+      height: 24px;
+      border: 1.5px solid rgba(148, 163, 184, 0.25);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
+    }
+
+    .cursor-ring.hovered {
+      width: 36px;
+      height: 36px;
+      border-color: rgba(34, 211, 238, 0.5);
+    }
+
+    /* ── Animated Background ── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background: linear-gradient(-45deg, #0f172a 0%, #1a2540 25%, #0f172a 50%, #162338 75%, #0f172a 100%);
+      background-size: 400% 400%;
+      animation: bgShift 25s ease infinite;
+    }
+
+    @keyframes bgShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Subtle geometric shapes */
+    .geo-shapes {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .geo-shapes::before {
+      content: '';
+      position: absolute;
+      top: 15%;
+      right: -80px;
+      width: 300px;
+      height: 300px;
+      border: 1px solid rgba(34, 211, 238, 0.04);
+      border-radius: 50%;
+    }
+
+    .geo-shapes::after {
+      content: '';
+      position: absolute;
+      bottom: 20%;
+      left: -60px;
+      width: 240px;
+      height: 240px;
+      border: 1px solid rgba(16, 185, 129, 0.04);
+      transform: rotate(45deg);
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── Header ── */
+    .header {
+      padding: 5rem 0 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-name {
+      font-size: 2.5rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--primary);
+      margin-bottom: 1.25rem;
+    }
+
+    .header-links {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.25rem 2rem;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+      gap: 1rem;
+      flex-wrap: wrap;
     }
 
-    .navbar-brand {
-      font-size: 1.25rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.025em;
-    }
-
-    .navbar-links { display: flex; gap: 1.5rem; align-items: center; }
-
-    .navbar-links a {
+    .header-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 500;
       transition: color 0.2s;
-    }
-    .navbar-links a:hover { color: var(--text); }
-
-    /* ══════════════════════════════════════════════
-       HERO SECTION
-       ══════════════════════════════════════════════ */
-    .hero {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 85vh;
-      padding: 4rem 2rem;
-      text-align: center;
+      gap: 0.35rem;
     }
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.4rem 1rem;
-      background: rgba(34, 211, 238, 0.08);
-      border: 1px solid rgba(34, 211, 238, 0.2);
-      border-radius: 9999px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 2rem;
-      animation: fadeSlideUp 0.6s ease-out both;
-    }
-    .hero-badge .dot {
-      width: 6px; height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
+    .header-links a:hover {
+      color: var(--text);
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.3); }
+    .header-links .sep {
+      color: var(--text-dim);
+      user-select: none;
     }
 
-    .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 900;
-      letter-spacing: -0.035em;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      animation: fadeSlideUp 0.7s ease-out 0.1s both;
-    }
-    .hero h1 .gradient-text {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* ── Sections ── */
+    .section {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--border);
     }
 
-    .hero p {
-      font-size: 1.2rem;
+    .section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── About ── */
+    .about-text {
       color: var(--text-muted);
-      max-width: 38rem;
+      font-size: 0.95rem;
+      line-height: 1.75;
+    }
+
+    /* ── Skills ── */
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .skill-tag {
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(34, 211, 238, 0.05);
+      border: 1px solid rgba(34, 211, 238, 0.12);
+      border-radius: 6px;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .skill-tag:hover {
+      color: var(--primary);
+      border-color: rgba(34, 211, 238, 0.35);
+      background: rgba(34, 211, 238, 0.08);
+      transform: translateY(-1px);
+    }
+
+    /* ── Project Card (Glass) ── */
+    .project-card {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    }
+
+    .project-card:hover {
+      border-color: rgba(34, 211, 238, 0.25);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+      gap: 1rem;
+    }
+
+    .project-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .project-badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .project-desc {
+      color: var(--text-muted);
+      font-size: 0.88rem;
       line-height: 1.7;
-      margin-bottom: 2.5rem;
-      animation: fadeSlideUp 0.7s ease-out 0.2s both;
+      margin-bottom: 1rem;
     }
 
-    @keyframes fadeSlideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 1.25rem;
     }
 
-    /* ── Glow Button ─────────────────────────────── */
-    .btn-glow {
+    .project-tech span {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.9rem 2rem;
-      font-size: 1rem;
+      gap: 0.4rem;
+      padding: 0.55rem 1.25rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: var(--bg);
       background: linear-gradient(135deg, var(--primary), var(--accent));
       border: none;
-      border-radius: 0.75rem;
+      border-radius: 8px;
       text-decoration: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
-      animation: fadeSlideUp 0.7s ease-out 0.3s both;
-    }
-    .btn-glow:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        0 0 30px rgba(34, 211, 238, 0.4),
-        0 0 60px rgba(34, 211, 238, 0.15);
-    }
-    .btn-glow .arrow {
-      transition: transform 0.3s;
-    }
-    .btn-glow:hover .arrow {
-      transform: translateX(4px);
+      transition: all 0.25s;
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.15);
     }
 
-    /* ══════════════════════════════════════════════
-       PROJECT TEASER
-       ══════════════════════════════════════════════ */
-    .teaser-section {
-      padding: 5rem 2rem;
-      display: flex;
-      justify-content: center;
+    .btn:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 0 24px rgba(34, 211, 238, 0.3);
     }
 
-    .teaser-card {
-      max-width: 56rem;
-      width: 100%;
-      background: rgba(30, 41, 59, 0.6);
-      border: 1px solid rgba(51, 65, 85, 0.5);
-      border-radius: 1.25rem;
-      overflow: hidden;
-      backdrop-filter: blur(12px);
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .teaser-card:hover {
-      border-color: rgba(34, 211, 238, 0.3);
-      box-shadow: 0 0 40px rgba(34, 211, 238, 0.08);
-    }
-
-    .teaser-preview {
-      position: relative;
-      height: 300px;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-      overflow: hidden;
-    }
-
-    /* Abstract building silhouette via CSS */
-    .teaser-preview .building-shapes {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      opacity: 0.3;
-      filter: blur(1px);
-    }
-    .teaser-preview .shape {
-      background: rgba(34, 211, 238, 0.12);
-      border: 1px solid rgba(34, 211, 238, 0.15);
-      border-radius: 0.5rem;
-    }
-    .teaser-preview .shape-hex {
-      width: 80px; height: 90px;
-      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-      background: rgba(34, 211, 238, 0.08);
-      border: none;
-    }
-    .teaser-preview .shape-sq {
-      width: 50px; height: 50px;
-      transform: rotate(45deg);
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.15);
-    }
-
-    .teaser-preview .preview-label {
-      position: absolute;
-      bottom: 1.25rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      background: rgba(15, 23, 42, 0.8);
-      padding: 0.3rem 1rem;
-      border-radius: 9999px;
-      border: 1px solid var(--border);
-    }
-
-    /* Blurred glowing orbs */
-    .teaser-preview .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(50px);
-      opacity: 0.25;
-    }
-    .teaser-preview .orb-1 {
-      width: 200px; height: 200px;
-      background: var(--primary);
-      top: -40px; left: -40px;
-    }
-    .teaser-preview .orb-2 {
-      width: 150px; height: 150px;
-      background: var(--accent);
-      bottom: -30px; right: -30px;
-    }
-
-    .teaser-info {
-      padding: 2rem;
-    }
-    .teaser-info h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-    }
-    .teaser-info p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    .teaser-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 1.25rem;
-    }
-    .teaser-tags span {
-      padding: 0.3rem 0.75rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--primary);
-      background: rgba(34, 211, 238, 0.08);
-      border: 1px solid rgba(34, 211, 238, 0.15);
-      border-radius: 9999px;
-    }
-
-    /* ══════════════════════════════════════════════
-       FEATURES SECTION
-       ══════════════════════════════════════════════ */
-    .features-section {
-      padding: 5rem 2rem;
-      max-width: 64rem;
-      margin: 0 auto;
-    }
-    .features-section h2 {
-      text-align: center;
-      font-size: 2rem;
-      font-weight: 800;
-      margin-bottom: 3rem;
-      letter-spacing: -0.025em;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .feature-card {
-      background: rgba(30, 41, 59, 0.5);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 2rem;
-      transition: all 0.3s ease;
-    }
-    .feature-card:hover {
-      border-color: rgba(34, 211, 238, 0.3);
-      transform: translateY(-4px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .feature-icon {
-      width: 3rem; height: 3rem;
-      border-radius: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1.25rem;
-      font-size: 1.3rem;
-    }
-    .feature-icon.cyan { background: rgba(34, 211, 238, 0.12); }
-    .feature-icon.green { background: rgba(16, 185, 129, 0.12); }
-    .feature-icon.violet { background: rgba(139, 92, 246, 0.12); }
-
-    .feature-card h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-    .feature-card p {
-      color: var(--text-muted);
+    .btn .arrow {
+      transition: transform 0.2s;
       font-size: 0.9rem;
-      line-height: 1.6;
     }
 
-    /* ══════════════════════════════════════════════
-       FOOTER
-       ══════════════════════════════════════════════ */
-    .footer {
-      text-align: center;
-      padding: 3rem 2rem;
-      border-top: 1px solid var(--border);
+    .btn:hover .arrow {
+      transform: translateX(3px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      color: var(--text);
+      border-color: var(--text-dim);
+      box-shadow: none;
+      transform: translateY(-1px);
+    }
+
+    /* ── Education ── */
+    .edu-card {
+      background: var(--surface);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .edu-degree {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .edu-school {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .edu-year {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    /* ── Contact ── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
       color: var(--text-muted);
       font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
     }
-    .footer strong {
+
+    .contact-item:hover {
       color: var(--text);
-      font-weight: 600;
+      border-color: rgba(34, 211, 238, 0.25);
+      transform: translateY(-1px);
     }
 
-    /* ══════════════════════════════════════════════
-       RESPONSIVE
-       ══════════════════════════════════════════════ */
-    @media (max-width: 640px) {
-      .navbar { padding: 1rem; }
-      .hero { min-height: 70vh; padding: 3rem 1.5rem; }
-      .teaser-preview { height: 200px; }
-      .features-grid { grid-template-columns: 1fr; }
+    .contact-icon {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+    }
 
-      /* Disable custom cursor on touch devices */
-      body { cursor: auto; }
-      .cursor-dot { display: none; }
+    /* ── Footer ── */
+    .footer {
+      padding: 2.5rem 0;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .header {
+        padding: 3rem 0 2rem;
+      }
+
+      .header-name {
+        font-size: 1.75rem;
+      }
+
+      body {
+        cursor: auto;
+      }
+
+      .cursor-dot,
+      .cursor-ring {
+        display: none;
+      }
     }
   </style>
 </head>
+
 <body>
-  <!-- Animated gradient background -->
-  <div class="gradient-bg"></div>
-  <div class="grid-overlay"></div>
+  <div class="bg-layer"></div>
+  <div class="geo-shapes"></div>
+  <div class="cursor-dot" id="dot"></div>
+  <div class="cursor-ring" id="ring"></div>
 
-  <!-- Custom cursor -->
-  <div class="cursor-dot" id="cursor"></div>
-
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar-brand">Gaurav</div>
-    <div class="navbar-links">
-      <a href="#project">Project</a>
-      <a href="#features">Features</a>
-      <a href="/" class="btn-glow" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">
-        View Project <span class="arrow">→</span>
-      </a>
-    </div>
-  </nav>
-
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-badge">
-      <span class="dot"></span>
-      Academic Project
-    </div>
-    <h1>
-      Indoor Navigation<br />
-      <span class="gradient-text">System</span>
-    </h1>
-    <p>
-      An intelligent wayfinding solution for the VIT PRP Academic Block. Graph-based pathfinding with A* algorithm, multi-floor support, and real-time visual guidance.
-    </p>
-    <a href="/" class="btn-glow">
-      View Project <span class="arrow">→</span>
-    </a>
-  </section>
-
-  <!-- Project Teaser -->
-  <section class="teaser-section" id="project">
-    <div class="teaser-card">
-      <div class="teaser-preview">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="building-shapes">
-          <div class="shape-hex shape"></div>
-          <div class="shape-sq shape"></div>
-          <div class="shape-hex shape"></div>
-          <div class="shape-sq shape"></div>
-          <div class="shape-hex shape"></div>
-        </div>
-        <div class="preview-label">PRP Academic Block — 5 Blocks · 3 Floors</div>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="header-name">Gauravsingh Rajpurohit</h1>
+      <p class="header-title">Full Stack Developer</p>
+      <div class="header-links">
+        <a href="mailto:gauravrajpurohit2006@gmail.com">📧 Email</a>
+        <span class="sep">·</span>
+        <a href="https://github.com/GauravHmm" target="_blank" rel="noopener">⌨ GitHub</a>
+        <span class="sep">·</span>
+        <a href="https://linkedin.com/in/" target="_blank" rel="noopener">💼 LinkedIn</a>
+        <span class="sep">·</span>
+        <a href="https://prp-indoor-navigation.vercel.app/navigation" target="_blank" rel="noopener">🌐 Live Project</a>
       </div>
-      <div class="teaser-info">
-        <h3>VIT PRP Academic Block Navigation</h3>
-        <p>
-          Navigate a sprawling 5-block academic complex with intelligent pathfinding. The system models the building as a graph with rooms, corridors, stairs, and elevators as nodes, finding optimal routes using the A* algorithm and Dijkstra's algorithm for nearest-facility search.
+    </header>
+
+    <!-- About -->
+    <section class="section">
+      <h2 class="section-title">About</h2>
+      <p class="about-text">
+        Computer Science student at VIT with a focus on full-stack development and algorithmic problem solving.
+        Experienced in building interactive web applications with React, Next.js, and TypeScript.
+        Passionate about creating practical solutions to real-world problems — from indoor navigation systems
+        to data-driven dashboards.
+      </p>
+    </section>
+
+    <!-- Skills -->
+    <section class="section">
+      <h2 class="section-title">Skills</h2>
+      <div class="skills-grid">
+        <span class="skill-tag">React</span>
+        <span class="skill-tag">Next.js</span>
+        <span class="skill-tag">TypeScript</span>
+        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">Tailwind CSS</span>
+        <span class="skill-tag">Node.js</span>
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">C++</span>
+        <span class="skill-tag">Git</span>
+        <span class="skill-tag">SVG / Canvas</span>
+        <span class="skill-tag">Data Structures</span>
+        <span class="skill-tag">Algorithms</span>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="section">
+      <h2 class="section-title">Projects</h2>
+      <div class="project-card">
+        <div class="project-header">
+          <h3 class="project-name">PRP Indoor Navigation System</h3>
+          <span class="project-badge">Featured</span>
+        </div>
+        <p class="project-desc">
+          A web-based indoor navigation system for the VIT PRP Academic Block. Models a 5-block, 3-floor building
+          as a graph with 200+ nodes and uses the A* algorithm to find optimal routes. Features interactive SVG
+          maps with zoom/pan, multi-floor path segmentation, and nearest-facility search using Dijkstra's algorithm.
         </p>
-        <div class="teaser-tags">
+        <div class="project-tech">
           <span>Next.js</span>
           <span>TypeScript</span>
           <span>A* Algorithm</span>
-          <span>SVG Maps</span>
-          <span>Multi-Floor</span>
+          <span>Dijkstra</span>
+          <span>SVG</span>
+          <span>Tailwind CSS</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a href="https://prp-indoor-navigation.vercel.app/navigation" class="btn" target="_blank" rel="noopener">
+            View Project <span class="arrow">→</span>
+          </a>
+          <a href="https://github.com/GauravHmm/PRP-Indoor-Navigation" class="btn btn-outline" target="_blank"
+            rel="noopener">
+            Source Code
+          </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Features -->
-  <section class="features-section" id="features">
-    <h2>Key Features</h2>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon cyan">📍</div>
-        <h3>Interactive Maps</h3>
-        <p>Zoomable, pannable SVG floor plans with color-coded rooms, corridors, and facilities. Real-time path overlay.</p>
+    <!-- Education -->
+    <section class="section">
+      <h2 class="section-title">Education</h2>
+      <div class="edu-card">
+        <p class="edu-degree">B.Tech in Computer Science and Engineering</p>
+        <p class="edu-school">Vellore Institute of Technology (VIT), Vellore</p>
+        <p class="edu-year">2024 – 2028</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon green">⚡</div>
-        <h3>Smart Routing</h3>
-        <p>A* pathfinding calculates optimal routes across multiple floors with distance-based heuristics and floor change penalties.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon violet">🔍</div>
-        <h3>Instant Search</h3>
-        <p>Find any classroom, lab, office, or facility with full-text search. Auto-find nearest washroom, water, or elevator.</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p><strong>Indoor Navigation System</strong></p>
-    <p style="margin-top: 0.5rem;">VIT PRP Academic Block · Designed &amp; Built by Gaurav</p>
-  </footer>
+    <!-- Contact -->
+    <section class="section">
+      <h2 class="section-title">Contact</h2>
+      <div class="contact-grid">
+        <a href="mailto:gauravrajpurohit2006@gmail.com" class="contact-item">
+          <span class="contact-icon">📧</span> mail
+        </a>
+        <a href="https://github.com/GauravHmm" target="_blank" rel="noopener" class="contact-item">
+          <span class="contact-icon">⌨</span> GitHub
+        </a>
+        <a href="https://linkedin.com/in/" target="_blank" rel="noopener" class="contact-item">
+          <span class="contact-icon">💼</span> LinkedIn
+        </a>
+      </div>
+    </section>
 
-  <!-- Cursor Script -->
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Gauravsingh Rajpurohit · 2026</p>
+    </footer>
+  </div>
+
   <script>
-    const cursor = document.getElementById('cursor');
-    let mouseX = 0, mouseY = 0;
+    const dot = document.getElementById('dot');
+    const ring = document.getElementById('ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
 
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      cursor.style.left = mouseX + 'px';
-      cursor.style.top = mouseY + 'px';
-    });
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
-    // Expand cursor on interactive elements
-    const interactives = document.querySelectorAll('a, button, .feature-card, .teaser-card');
-    interactives.forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('expanded'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('expanded'));
+    function animate() {
+      dot.style.left = mx + 'px';
+      dot.style.top = my + 'px';
+      rx += (mx - rx) * 0.15;
+      ry += (my - ry) * 0.15;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    document.querySelectorAll('a, button, .skill-tag, .project-card, .contact-item, .edu-card').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hovered'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hovered'));
     });
   </script>
 </body>
+
 </html>

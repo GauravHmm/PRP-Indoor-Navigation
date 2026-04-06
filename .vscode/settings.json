@@ -1,3 +1,4 @@
 {
-    "explorer.enableUndo": true
+    "explorer.enableUndo": true,
+    "liveServer.settings.port": 5501
 }

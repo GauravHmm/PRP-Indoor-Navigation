@@ -6,6 +6,7 @@ import { BuildingMap } from "@/components/building-map"
 import { NavigationPanel } from "@/components/navigation-panel"
 import type { Route } from "@/lib/pathfinding"
 import { ArrowLeft } from "lucide-react"
+import { CustomCursor } from "@/components/custom-cursor"
 
 export default function NavigationApp() {
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
@@ -26,6 +27,7 @@ export default function NavigationApp() {
 
   return (
     <main className="min-h-screen bg-[#0a0f1e]">
+      <CustomCursor subtle />
       {/* ── Header ─────────────────────────────── */}
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#0f172a]/85 border-b border-slate-700/40 shadow-xl shadow-black/20">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">

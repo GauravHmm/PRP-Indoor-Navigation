@@ -8,26 +8,16 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Gaurav - Indoor Navigation System Portfolio",
+  title: "PRP Indoor Navigation",
   description:
-    "Professional portfolio showcasing an indoor navigation system for academic buildings with smart routing and multi-floor support",
-  generator: "v0.app",
+    "Indoor navigation system for the VIT PRP Academic Block with smart routing, multi-floor support, and real-time visual guidance.",
   icons: {
     icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
       {
         url: "/icon.svg",
         type: "image/svg+xml",
       },
     ],
-    apple: "/apple-icon.png",
   },
 }
 

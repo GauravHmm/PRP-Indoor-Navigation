@@ -37,6 +37,10 @@ const E_NODES: NavNode[] = [
   { id: "E_rc3", x: 304, y: 155, floor: 1, block: "E", type: "corridor", name: "E" },
   { id: "E_rc4", x: 304, y: 182, floor: 1, block: "E", type: "corridor", name: "E" },
   { id: "E_rc5", x: 304, y: 208, floor: 1, block: "E", type: "corridor", name: "E" },
+  // Horizontal mid-corridor (E2→E1 straight path, symmetric to A block)
+  { id: "E_mc1", x: 220, y: 155, floor: 1, block: "E", type: "corridor", name: "E" },
+  { id: "E_mc2", x: 250, y: 155, floor: 1, block: "E", type: "corridor", name: "E" },
+  { id: "E_mc3", x: 280, y: 155, floor: 1, block: "E", type: "corridor", name: "E" },
   // Rooms/services around perimeter
   { id: "E_s1", x: 250, y: 62, floor: 1, block: "E", type: "stairs", name: "Stairs", description: "top" },
   { id: "E_lf1", x: 268, y: 75, floor: 1, block: "E", type: "elevator", name: "Lift", description: "upper, near G54" },
@@ -54,8 +58,8 @@ const E_NODES: NavNode[] = [
   { id: "E_G30", x: 184, y: 198, floor: 1, block: "E", type: "room", name: "G30" },
   { id: "E_G20", x: 316, y: 198, floor: 1, block: "E", type: "room", name: "G20" },
   // Sitting areas (center, dead-end)
-  { id: "E_sit1", x: 188, y: 118, floor: 1, block: "E", type: "room", name: "Sitting Area", description: "upper, E block" },
-  { id: "E_sit2", x: 188, y: 182, floor: 1, block: "E", type: "room", name: "Sitting Area", description: "lower, E block" },
+  { id: "E_sit1", x: 245, y: 140, floor: 1, block: "E", type: "room", name: "Sitting Area", description: "upper, E block" },
+  { id: "E_sit2", x: 255, y: 170, floor: 1, block: "E", type: "room", name: "Sitting Area", description: "lower, E block" },
 ]
 
 // ═══ A BLOCK ═══
@@ -102,12 +106,12 @@ const A_NODES: NavNode[] = [
   { id: "A_G51", x: 816, y: 118, floor: 1, block: "A", type: "room", name: "G51", description: "Biosafety Level-II Lab" },
   { id: "A_G52", x: 816, y: 148, floor: 1, block: "A", type: "room", name: "G52", description: "Molecular Technology Lab" },
   { id: "A_G53", x: 816, y: 168, floor: 1, block: "A", type: "room", name: "G53", description: "Genomics & Bioinformatics Lab" },
-  { id: "A_G54", x: 812, y: 272, floor: 1, block: "A", type: "room", name: "G54", description: "Phage Directory Lab" },
+  { id: "A_G54", x: 816, y: 188, floor: 1, block: "A", type: "room", name: "G54", description: "Phage Directory Lab" },
   // Sitting areas (center of hex, dead-end)
   { id: "A_sit1", x: 745, y: 140, floor: 1, block: "A", type: "room", name: "Sitting Area", description: "upper, A block" },
   { id: "A_sit2", x: 755, y: 165, floor: 1, block: "A", type: "room", name: "Sitting Area", description: "lower, A block" },
   // Bottom
-  { id: "A_G43", x: 696, y: 225, floor: 1, block: "A", type: "room", name: "G43", description: "Men's Washroom" },
+  { id: "A_G43", x: 684, y: 215, floor: 1, block: "A", type: "room", name: "G43", description: "Men's Washroom" },
 ]
 
 // ═══ C BLOCK ═══
@@ -299,7 +303,7 @@ const D_NODES: NavNode[] = [
   { id: "D_G72", x: 300, y: 758, floor: 1, block: "D", type: "room", name: "G72", description: "Canteen" },
   { id: "Db_sl", x: 340, y: 782, floor: 1, block: "D", type: "stairs", name: "Stairs", description: "center" },
   { id: "Db_lf", x: 310, y: 790, floor: 1, block: "D", type: "elevator", name: "Lift", description: "left side" },
-  { id: "D_G68", x: 300, y: 812, floor: 1, block: "D", type: "room", name: "G68" },
+  { id: "D_G68", x: 330, y: 808, floor: 1, block: "D", type: "room", name: "G68" },
 ]
 
 
@@ -311,7 +315,7 @@ const B_NODES: NavNode[] = [
   { id: "Bb_i1", x: 660, y: 768, floor: 1, block: "B", type: "intersection", name: "B" },
   { id: "Bb_i2", x: 660, y: 800, floor: 1, block: "B", type: "intersection", name: "B" },
   // Rooms — near top-right edge per sketch
-  { id: "B_G60", x: 700, y: 742, floor: 1, block: "B", type: "room", name: "G60", description: "Exam Hall / Faculty Cabins" },
+  { id: "B_G60", x: 690, y: 748, floor: 1, block: "B", type: "room", name: "G60", description: "Exam Hall / Faculty Cabins" },
   { id: "B_G61", x: 700, y: 755, floor: 1, block: "B", type: "room", name: "G61" },
   { id: "B_mr", x: 700, y: 778, floor: 1, block: "B", type: "room", name: "Men's WR", description: "Men's Washroom" },
   { id: "Bb_sl", x: 660, y: 782, floor: 1, block: "B", type: "stairs", name: "Stairs", description: "center" },
@@ -457,7 +461,11 @@ const _groundEdges: NavEdge[] = [
     ([a,b])=>({from:a,to:b,distance:28,floor:1,type:"corridor" as const})),
   { from:"E_rc5",to:"E_ib",distance:20,floor:1,type:"corridor" },
   { from:"E_lc1",to:"E_rc1",distance:100,floor:1,type:"corridor" },
-  { from:"E_lc3",to:"E_rc3",distance:120,floor:1,type:"corridor" },
+  // Horizontal mid-corridor (E2→E1)
+  { from:"E_lc3",to:"E_mc1",distance:25,floor:1,type:"corridor" },
+  { from:"E_mc1",to:"E_mc2",distance:30,floor:1,type:"corridor" },
+  { from:"E_mc2",to:"E_mc3",distance:30,floor:1,type:"corridor" },
+  { from:"E_mc3",to:"E_rc3",distance:25,floor:1,type:"corridor" },
   { from:"E1",to:"E_rc3",distance:8,floor:1,type:"corridor" },
   { from:"E2",to:"E_lc3",distance:8,floor:1,type:"corridor" },
   { from:"E_s1",to:"E_it",distance:8,floor:1,type:"corridor" },
@@ -477,8 +485,8 @@ const _groundEdges: NavEdge[] = [
   { from:"E_lf1",to:"E_it",distance:10,floor:1,type:"corridor" },
   { from:"E_st2",to:"E_rc2",distance:8,floor:1,type:"corridor" },
   // Sitting areas (DEAD-END)
-  { from:"E_sit1",to:"E_lc2",distance:15,floor:1,type:"corridor" },
-  { from:"E_sit2",to:"E_lc4",distance:15,floor:1,type:"corridor" },
+  { from:"E_sit1",to:"E_mc2",distance:15,floor:1,type:"corridor" },
+  { from:"E_sit2",to:"E_mc2",distance:15,floor:1,type:"corridor" },
 
   // ═══ A BLOCK ═══
   // Left wall corridor spine (parallel to left hex edge)
@@ -514,7 +522,7 @@ const _groundEdges: NavEdge[] = [
   { from:"A_G51",to:"A_rc2",distance:8,floor:1,type:"corridor" },
   { from:"A_G52",to:"A_rc3",distance:8,floor:1,type:"corridor" },
   { from:"A_G53",to:"A_rc4",distance:8,floor:1,type:"corridor" },
-  { from:"A_G54",to:"A_rc5",distance:8,floor:1,type:"corridor" },
+  { from:"A_G54",to:"A_rc4",distance:8,floor:1,type:"corridor" },
   // Sitting areas (DEAD-END)
   { from:"A_sit1",to:"A_mc2",distance:15,floor:1,type:"corridor" },
   { from:"A_sit2",to:"A_mc2",distance:15,floor:1,type:"corridor" },

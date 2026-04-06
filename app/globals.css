@@ -263,16 +263,5 @@
     0% {
       box-shadow: 0 0 15px rgba(34, 211, 238, 0.6);
     }
-    100% {
-      box-shadow: 0 0 0 rgba(34, 211, 238, 0);
-    }
-  }
-
-  /* ── Custom cursor (landing/portfolio only) ────── */
-  .custom-cursor {
-    cursor: none;
-  }
-  .custom-cursor * {
-    cursor: none;
   }
 }
