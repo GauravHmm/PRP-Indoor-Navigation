@@ -4,9 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gauravsingh Rajpurohit — Developer Portfolio</title>
-  <meta name="description"
-    content="Portfolio of Gauravsing Rajpurohit — full-stack developer, indoor navigation systems, and web applications." />
+  <title>Gauravsingh Rajpurohit — Developer</title>
+  <meta name="description" content="Resume of Gauravsingh Rajpurohit — Full Stack Developer, VIT Vellore." />
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,15 +21,14 @@
     }
 
     :root {
-      --bg: #0f172a;
-      --surface: rgba(30, 41, 59, 0.6);
-      --surface-solid: #1e293b;
-      --primary: #22d3ee;
-      --accent: #10b981;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --border: rgba(51, 65, 85, 0.5);
+      --bg: #111111;
+      --surface: #191919;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --text-secondary: #a0a0a0;
+      --text-dim: #666666;
+      --accent: #888888;
+      --link: #c0c0c0;
     }
 
     html {
@@ -38,551 +36,516 @@
     }
 
     body {
-      font-family: 'Inter', system-ui, sans-serif;
-      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
+      color: var(--text);
       line-height: 1.6;
       cursor: none;
-      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Dual-layer Cursor ── */
-    .cursor-dot {
+    /* ── Custom cursor ── */
+    .cursor {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 6px;
-      height: 6px;
-      background: var(--primary);
+      width: 8px;
+      height: 8px;
+      background: var(--text-secondary);
       border-radius: 50%;
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%, -50%);
-      transition: background 0.2s;
+      transition: opacity 0.2s;
     }
 
-    .cursor-ring {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 24px;
-      height: 24px;
-      border: 1.5px solid rgba(148, 163, 184, 0.25);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
-    }
-
-    .cursor-ring.hovered {
-      width: 36px;
-      height: 36px;
-      border-color: rgba(34, 211, 238, 0.5);
-    }
-
-    /* ── Animated Background ── */
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      background: linear-gradient(-45deg, #0f172a 0%, #1a2540 25%, #0f172a 50%, #162338 75%, #0f172a 100%);
-      background-size: 400% 400%;
-      animation: bgShift 25s ease infinite;
-    }
-
-    @keyframes bgShift {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      50% {
-        background-position: 100% 50%;
-      }
-
-      100% {
-        background-position: 0% 50%;
-      }
-    }
-
-    /* Subtle geometric shapes */
-    .geo-shapes {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .geo-shapes::before {
-      content: '';
-      position: absolute;
-      top: 15%;
-      right: -80px;
-      width: 300px;
-      height: 300px;
-      border: 1px solid rgba(34, 211, 238, 0.04);
-      border-radius: 50%;
-    }
-
-    .geo-shapes::after {
-      content: '';
-      position: absolute;
-      bottom: 20%;
-      left: -60px;
-      width: 240px;
-      height: 240px;
-      border: 1px solid rgba(16, 185, 129, 0.04);
-      transform: rotate(45deg);
+    a,
+    button,
+    a *,
+    button * {
+      cursor: pointer !important;
     }
 
     /* ── Layout ── */
-    .container {
-      max-width: 720px;
+    .page {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 1.5rem;
+      padding: 4rem 3rem;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 4rem;
     }
 
-    /* ── Header ── */
-    .header {
-      padding: 5rem 0 3rem;
-      border-bottom: 1px solid var(--border);
+    /* ── LEFT COLUMN ── */
+    .sidebar {
+      position: sticky;
+      top: 4rem;
+      align-self: start;
     }
 
-    .header-name {
-      font-size: 2.5rem;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-      line-height: 1.1;
-      margin-bottom: 0.5rem;
+    .name {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 0.25rem;
     }
 
-    .header-title {
-      font-size: 1.1rem;
+    .role {
+      font-size: 0.9rem;
       font-weight: 500;
-      color: var(--primary);
-      margin-bottom: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
     }
 
-    .header-links {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
+    .sidebar-section {
+      margin-bottom: 2rem;
     }
 
-    .header-links a {
-      color: var(--text-muted);
+    .sidebar-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    .contact-list {
+      list-style: none;
+    }
+
+    .contact-list li {
+      margin-bottom: 0.4rem;
+    }
+
+    .contact-list a {
+      color: var(--text-secondary);
       text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-size: 0.82rem;
+      font-weight: 400;
       transition: color 0.2s;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.4rem;
     }
 
-    .header-links a:hover {
+    .contact-list a:hover {
       color: var(--text);
     }
 
-    .header-links .sep {
+    .contact-list .label {
       color: var(--text-dim);
-      user-select: none;
+      font-size: 0.72rem;
+      font-weight: 600;
+      width: 50px;
+      flex-shrink: 0;
     }
 
-    /* ── Sections ── */
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .skill {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 0.3rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .skill:hover {
+      border-color: #444;
+      color: var(--text);
+    }
+
+    .languages-text {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── RIGHT COLUMN ── */
+    .main {
+      padding-top: 0.25rem;
+    }
+
     .section {
-      padding: 2.5rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section:last-of-type {
-      border-bottom: none;
+      margin-bottom: 2.75rem;
     }
 
     .section-title {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       color: var(--text-dim);
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
     }
 
-    /* ── About ── */
+    /* About */
     .about-text {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.75;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      max-width: 600px;
     }
 
-    /* ── Skills ── */
-    .skills-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+    /* Projects */
+    .project {
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.25s, transform 0.25s;
     }
 
-    .skill-tag {
-      padding: 0.35rem 0.85rem;
-      font-size: 0.78rem;
-      font-weight: 600;
-      background: rgba(34, 211, 238, 0.05);
-      border: 1px solid rgba(34, 211, 238, 0.12);
-      border-radius: 6px;
-      color: var(--text-muted);
-      transition: all 0.2s;
-    }
-
-    .skill-tag:hover {
-      color: var(--primary);
-      border-color: rgba(34, 211, 238, 0.35);
-      background: rgba(34, 211, 238, 0.08);
+    .project:hover {
+      border-color: #444;
       transform: translateY(-1px);
     }
 
-    /* ── Project Card (Glass) ── */
-    .project-card {
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.75rem;
-      margin-bottom: 1rem;
-      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
-    }
-
-    .project-card:hover {
-      border-color: rgba(34, 211, 238, 0.25);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      transform: translateY(-2px);
-    }
-
-    .project-header {
+    .project-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 0.75rem;
-      gap: 1rem;
+      margin-bottom: 0.5rem;
+      gap: 0.75rem;
     }
 
     .project-name {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       color: var(--text);
     }
 
-    .project-badge {
-      font-size: 0.6rem;
+    .featured-tag {
+      font-size: 0.58rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       color: var(--accent);
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .project-desc {
-      color: var(--text-muted);
-      font-size: 0.88rem;
-      line-height: 1.7;
-      margin-bottom: 1rem;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+
+    .project-desc ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .project-desc li {
+      padding-left: 0.8rem;
+      position: relative;
+      margin-bottom: 0.2rem;
+    }
+
+    .project-desc li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--text-dim);
+      font-weight: 700;
     }
 
     .project-tech {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-bottom: 1.25rem;
+      gap: 0.3rem;
+      margin-bottom: 0.75rem;
     }
 
     .project-tech span {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 600;
       color: var(--text-dim);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-    }
-
-    /* ── Buttons ── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.55rem 1.25rem;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--bg);
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border: none;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: all 0.25s;
-      box-shadow: 0 0 12px rgba(34, 211, 238, 0.15);
-    }
-
-    .btn:hover {
-      transform: translateY(-1px) scale(1.02);
-      box-shadow: 0 0 24px rgba(34, 211, 238, 0.3);
-    }
-
-    .btn .arrow {
-      transition: transform 0.2s;
-      font-size: 0.9rem;
-    }
-
-    .btn:hover .arrow {
-      transform: translateX(3px);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      box-shadow: none;
-    }
-
-    .btn-outline:hover {
-      color: var(--text);
-      border-color: var(--text-dim);
-      box-shadow: none;
-      transform: translateY(-1px);
-    }
-
-    /* ── Education ── */
-    .edu-card {
       background: var(--surface);
-      backdrop-filter: blur(8px);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.25rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+    }
+
+    .project-links {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .project-links a {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .project-links a:hover {
+      color: var(--text);
+    }
+
+    .project-links a::after {
+      content: ' →';
+      font-size: 0.7rem;
+    }
+
+    /* Education */
+    .edu-item {
+      margin-bottom: 0.75rem;
     }
 
     .edu-degree {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       color: var(--text);
     }
 
     .edu-school {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
     }
 
     .edu-year {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--text-dim);
     }
 
-    /* ── Contact ── */
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 0.75rem;
-    }
-
-    .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
-      background: var(--surface);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      text-decoration: none;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .contact-item:hover {
-      color: var(--text);
-      border-color: rgba(34, 211, 238, 0.25);
-      transform: translateY(-1px);
-    }
-
-    .contact-icon {
-      font-size: 1rem;
-      width: 20px;
-      text-align: center;
+    /* Achievements */
+    .achievements-text {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
     }
 
     /* ── Footer ── */
-    .footer {
-      padding: 2.5rem 0;
-      text-align: center;
+    .footer-badge {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      font-size: 0.65rem;
       color: var(--text-dim);
-      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+
+    .footer-badge strong {
+      font-weight: 600;
+      color: var(--text-secondary);
     }
 
     /* ── Responsive ── */
-    @media (max-width: 640px) {
-      .header {
-        padding: 3rem 0 2rem;
+    @media (max-width: 860px) {
+      .page {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        padding: 2.5rem 1.5rem;
       }
 
-      .header-name {
-        font-size: 1.75rem;
+      .sidebar {
+        position: static;
+      }
+
+      .name {
+        font-size: 1.5rem;
       }
 
       body {
         cursor: auto;
       }
 
-      .cursor-dot,
-      .cursor-ring {
+      .cursor {
         display: none;
+      }
+
+      .footer-badge {
+        position: static;
+        padding: 2rem 0 1rem;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding: 2rem 1rem;
+      }
+
+      .project {
+        padding: 1rem;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="bg-layer"></div>
-  <div class="geo-shapes"></div>
-  <div class="cursor-dot" id="dot"></div>
-  <div class="cursor-ring" id="ring"></div>
+  <div class="cursor" id="cursor"></div>
 
-  <div class="container">
-    <!-- Header -->
-    <header class="header">
-      <h1 class="header-name">Gauravsingh Rajpurohit</h1>
-      <p class="header-title">Full Stack Developer</p>
-      <div class="header-links">
-        <a href="mailto:gauravrajpurohit2006@gmail.com">📧 Email</a>
-        <span class="sep">·</span>
-        <a href="https://github.com/GauravHmm" target="_blank" rel="noopener">⌨ GitHub</a>
-        <span class="sep">·</span>
-        <a href="https://linkedin.com/in/" target="_blank" rel="noopener">💼 LinkedIn</a>
-        <span class="sep">·</span>
-        <a href="https://prp-indoor-navigation.vercel.app/navigation" target="_blank" rel="noopener">🌐 Live Project</a>
+  <div class="page">
+    <!-- LEFT COLUMN -->
+    <aside class="sidebar">
+      <h1 class="name">Gauravsingh<br>Rajpurohit</h1>
+      <p class="role">Full Stack Developer</p>
+
+      <div class="sidebar-section">
+        <p class="sidebar-label">Contact</p>
+        <ul class="contact-list">
+          <li>
+            <a href="mailto:gauravrajpurohit2006@gmail.com">
+              <span class="label">Email</span> gauravrajpurohit2006@gmail.com
+            </a>
+          </li>
+          <li>
+            <a href="tel:+917506631555">
+              <span class="label">Phone</span> 7506631555
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/GauravHmm" target="_blank" rel="noopener">
+              <span class="label">GitHub</span> GauravHmm
+            </a>
+          </li>
+          <li>
+            <a href="https://www.linkedin.com/in/gauravsingh-rajpurohit-47409332b" target="_blank" rel="noopener">
+              <span class="label">LinkedIn</span> gauravsingh-rajpurohit
+            </a>
+          </li>
+          <li>
+            <span class="label" style="color: var(--text-dim); font-size: 0.72rem; font-weight: 600;">Location</span>
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">Vellore, Tamil Nadu</span>
+          </li>
+        </ul>
       </div>
-    </header>
 
-    <!-- About -->
-    <section class="section">
-      <h2 class="section-title">About</h2>
-      <p class="about-text">
-        Computer Science student at VIT with a focus on full-stack development and algorithmic problem solving.
-        Experienced in building interactive web applications with React, Next.js, and TypeScript.
-        Passionate about creating practical solutions to real-world problems — from indoor navigation systems
-        to data-driven dashboards.
-      </p>
-    </section>
-
-    <!-- Skills -->
-    <section class="section">
-      <h2 class="section-title">Skills</h2>
-      <div class="skills-grid">
-        <span class="skill-tag">React</span>
-        <span class="skill-tag">Next.js</span>
-        <span class="skill-tag">TypeScript</span>
-        <span class="skill-tag">JavaScript</span>
-        <span class="skill-tag">Tailwind CSS</span>
-        <span class="skill-tag">Node.js</span>
-        <span class="skill-tag">Python</span>
-        <span class="skill-tag">C++</span>
-        <span class="skill-tag">Git</span>
-        <span class="skill-tag">SVG / Canvas</span>
-        <span class="skill-tag">Data Structures</span>
-        <span class="skill-tag">Algorithms</span>
-      </div>
-    </section>
-
-    <!-- Projects -->
-    <section class="section">
-      <h2 class="section-title">Projects</h2>
-      <div class="project-card">
-        <div class="project-header">
-          <h3 class="project-name">PRP Indoor Navigation System</h3>
-          <span class="project-badge">Featured</span>
+      <div class="sidebar-section">
+        <p class="sidebar-label">Skills</p>
+        <div class="skills-list">
+          <span class="skill">React</span>
+          <span class="skill">Next.js</span>
+          <span class="skill">TypeScript</span>
+          <span class="skill">JavaScript</span>
+          <span class="skill">Tailwind CSS</span>
+          <span class="skill">Node.js</span>
+          <span class="skill">Python</span>
+          <span class="skill">C++</span>
+          <span class="skill">Git</span>
+          <span class="skill">SVG / Canvas</span>
+          <span class="skill">DSA</span>
         </div>
-        <p class="project-desc">
-          A web-based indoor navigation system for the VIT PRP Academic Block. Models a 5-block, 3-floor building
-          as a graph with 200+ nodes and uses the A* algorithm to find optimal routes. Features interactive SVG
-          maps with zoom/pan, multi-floor path segmentation, and nearest-facility search using Dijkstra's algorithm.
+      </div>
+
+      <div class="sidebar-section">
+        <p class="sidebar-label">Languages</p>
+        <p class="languages-text">English · Hindi · Marwari</p>
+      </div>
+    </aside>
+
+    <!-- RIGHT COLUMN -->
+    <main class="main">
+      <!-- About -->
+      <section class="section">
+        <h2 class="section-title">About</h2>
+        <p class="about-text">
+          Computer Science student at VIT focused on full-stack development, algorithms, and building real-world
+          applications. Experienced with React, Next.js, and TypeScript. Interested in creating efficient and
+          scalable solutions such as indoor navigation systems.
         </p>
-        <div class="project-tech">
-          <span>Next.js</span>
-          <span>TypeScript</span>
-          <span>A* Algorithm</span>
-          <span>Dijkstra</span>
-          <span>SVG</span>
-          <span>Tailwind CSS</span>
+      </section>
+
+      <!-- Projects -->
+      <section class="section">
+        <h2 class="section-title">Projects</h2>
+
+        <div class="project">
+          <div class="project-top">
+            <h3 class="project-name">PRP Indoor Navigation System</h3>
+            <span class="featured-tag">Featured</span>
+          </div>
+          <div class="project-desc">
+            <ul>
+              <li>Built a web-based indoor navigation system for a multi-block academic building using graph
+                algorithms.</li>
+              <li>Implemented A* for shortest path and Dijkstra for nearest facility search.</li>
+              <li>Includes interactive SVG maps with zoom, pan, and multi-floor navigation.</li>
+            </ul>
+          </div>
+          <div class="project-tech">
+            <span>Next.js</span>
+            <span>TypeScript</span>
+            <span>A*</span>
+            <span>Dijkstra</span>
+            <span>SVG</span>
+            <span>Tailwind CSS</span>
+          </div>
+          <div class="project-links">
+            <a href="https://prp-indoor-navigation.vercel.app/navigation" target="_blank" rel="noopener">Live Demo</a>
+            <a href="https://github.com/GauravHmm/PRP-Indoor-Navigation" target="_blank" rel="noopener">Source
+              Code</a>
+          </div>
         </div>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <a href="https://prp-indoor-navigation.vercel.app/navigation" class="btn" target="_blank" rel="noopener">
-            View Project <span class="arrow">→</span>
-          </a>
-          <a href="https://github.com/GauravHmm/PRP-Indoor-Navigation" class="btn btn-outline" target="_blank"
-            rel="noopener">
-            Source Code
-          </a>
+
+        <div class="project">
+          <div class="project-top">
+            <h3 class="project-name">Portfolio Website</h3>
+          </div>
+          <div class="project-desc">
+            <ul>
+              <li>Minimal responsive portfolio to showcase projects and skills.</li>
+            </ul>
+          </div>
+          <div class="project-tech">
+            <span>HTML</span>
+            <span>CSS</span>
+            <span>JavaScript</span>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Education -->
-    <section class="section">
-      <h2 class="section-title">Education</h2>
-      <div class="edu-card">
-        <p class="edu-degree">B.Tech in Computer Science and Engineering</p>
-        <p class="edu-school">Vellore Institute of Technology (VIT), Vellore</p>
-        <p class="edu-year">2024 – 2028</p>
-      </div>
-    </section>
+      <!-- Education -->
+      <section class="section">
+        <h2 class="section-title">Education</h2>
+        <div class="edu-item">
+          <p class="edu-degree">B.Tech in Computer Science and Engineering</p>
+          <p class="edu-school">Vellore Institute of Technology (VIT), Vellore</p>
+          <p class="edu-year">2024 – 2028</p>
+        </div>
+      </section>
 
-    <!-- Contact -->
-    <section class="section">
-      <h2 class="section-title">Contact</h2>
-      <div class="contact-grid">
-        <a href="mailto:gauravrajpurohit2006@gmail.com" class="contact-item">
-          <span class="contact-icon">📧</span> mail
-        </a>
-        <a href="https://github.com/GauravHmm" target="_blank" rel="noopener" class="contact-item">
-          <span class="contact-icon">⌨</span> GitHub
-        </a>
-        <a href="https://linkedin.com/in/" target="_blank" rel="noopener" class="contact-item">
-          <span class="contact-icon">💼</span> LinkedIn
-        </a>
-      </div>
-    </section>
+      <!-- Achievements -->
+      <section class="section">
+        <h2 class="section-title">Achievements</h2>
+        <p class="achievements-text">Hackathons · Coding contests</p>
+      </section>
+    </main>
+  </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>Gauravsingh Rajpurohit · 2026</p>
-    </footer>
+  <!-- Bottom-left badge -->
+  <div class="footer-badge">
+    <strong>Gauravsingh Rajpurohit</strong><br>
+    Reg.No: 24BCE2208
   </div>
 
   <script>
-    const dot = document.getElementById('dot');
-    const ring = document.getElementById('ring');
-    let mx = 0, my = 0, rx = 0, ry = 0;
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
 
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-
-    function animate() {
-      dot.style.left = mx + 'px';
-      dot.style.top = my + 'px';
-      rx += (mx - rx) * 0.15;
-      ry += (my - ry) * 0.15;
-      ring.style.left = rx + 'px';
-      ring.style.top = ry + 'px';
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-
-    document.querySelectorAll('a, button, .skill-tag, .project-card, .contact-item, .edu-card').forEach(el => {
-      el.addEventListener('mouseenter', () => ring.classList.add('hovered'));
-      el.addEventListener('mouseleave', () => ring.classList.remove('hovered'));
+    // Hide cursor when hovering links/buttons (pointer shows instead)
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.style.opacity = '0');
+      el.addEventListener('mouseleave', () => cursor.style.opacity = '1');
     });
   </script>
 </body>
