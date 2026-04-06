@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gaurav — Indoor Navigation System Portfolio</title>
+  <meta name="description" content="Portfolio showcasing an intelligent indoor navigation system for academic buildings with smart routing and multi-floor support." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ══════════════════════════════════════════════
+       RESET & BASE
+       ══════════════════════════════════════════════ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-light: #334155;
+      --primary: #22d3ee;
+      --accent: #10b981;
+      --warning: #facc15;
+      --danger: #ef4444;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ══════════════════════════════════════════════
+       CUSTOM CURSOR
+       ══════════════════════════════════════════════ */
+    .cursor-dot {
+      position: fixed;
+      top: 0; left: 0;
+      width: 8px; height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: width 0.2s ease, height 0.2s ease, background 0.2s ease, transform 0.2s ease;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-dot.expanded {
+      width: 32px; height: 32px;
+      background: rgba(34, 211, 238, 0.15);
+      border: 2px solid var(--primary);
+    }
+
+    /* ══════════════════════════════════════════════
+       ANIMATED GRADIENT BACKGROUND
+       ══════════════════════════════════════════════ */
+    .gradient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(-45deg, #0f172a 0%, #1e293b 25%, #0f172a 50%, #162033 75%, #0f172a 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Subtle grid overlay */
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ══════════════════════════════════════════════
+       NAVBAR
+       ══════════════════════════════════════════════ */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+    }
+
+    .navbar-brand {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.025em;
+    }
+
+    .navbar-links { display: flex; gap: 1.5rem; align-items: center; }
+
+    .navbar-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .navbar-links a:hover { color: var(--text); }
+
+    /* ══════════════════════════════════════════════
+       HERO SECTION
+       ══════════════════════════════════════════════ */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 85vh;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(34, 211, 238, 0.08);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      animation: fadeSlideUp 0.6s ease-out both;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      animation: fadeSlideUp 0.7s ease-out 0.1s both;
+    }
+    .hero h1 .gradient-text {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 38rem;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      animation: fadeSlideUp 0.7s ease-out 0.2s both;
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Glow Button ─────────────────────────────── */
+    .btn-glow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--bg);
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      border-radius: 0.75rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+      animation: fadeSlideUp 0.7s ease-out 0.3s both;
+    }
+    .btn-glow:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 30px rgba(34, 211, 238, 0.4),
+        0 0 60px rgba(34, 211, 238, 0.15);
+    }
+    .btn-glow .arrow {
+      transition: transform 0.3s;
+    }
+    .btn-glow:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    /* ══════════════════════════════════════════════
+       PROJECT TEASER
+       ══════════════════════════════════════════════ */
+    .teaser-section {
+      padding: 5rem 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .teaser-card {
+      max-width: 56rem;
+      width: 100%;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(51, 65, 85, 0.5);
+      border-radius: 1.25rem;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .teaser-card:hover {
+      border-color: rgba(34, 211, 238, 0.3);
+      box-shadow: 0 0 40px rgba(34, 211, 238, 0.08);
+    }
+
+    .teaser-preview {
+      position: relative;
+      height: 300px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      overflow: hidden;
+    }
+
+    /* Abstract building silhouette via CSS */
+    .teaser-preview .building-shapes {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      opacity: 0.3;
+      filter: blur(1px);
+    }
+    .teaser-preview .shape {
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid rgba(34, 211, 238, 0.15);
+      border-radius: 0.5rem;
+    }
+    .teaser-preview .shape-hex {
+      width: 80px; height: 90px;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      background: rgba(34, 211, 238, 0.08);
+      border: none;
+    }
+    .teaser-preview .shape-sq {
+      width: 50px; height: 50px;
+      transform: rotate(45deg);
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .teaser-preview .preview-label {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.8);
+      padding: 0.3rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+    }
+
+    /* Blurred glowing orbs */
+    .teaser-preview .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(50px);
+      opacity: 0.25;
+    }
+    .teaser-preview .orb-1 {
+      width: 200px; height: 200px;
+      background: var(--primary);
+      top: -40px; left: -40px;
+    }
+    .teaser-preview .orb-2 {
+      width: 150px; height: 150px;
+      background: var(--accent);
+      bottom: -30px; right: -30px;
+    }
+
+    .teaser-info {
+      padding: 2rem;
+    }
+    .teaser-info h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .teaser-info p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .teaser-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+    .teaser-tags span {
+      padding: 0.3rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: rgba(34, 211, 238, 0.08);
+      border: 1px solid rgba(34, 211, 238, 0.15);
+      border-radius: 9999px;
+    }
+
+    /* ══════════════════════════════════════════════
+       FEATURES SECTION
+       ══════════════════════════════════════════════ */
+    .features-section {
+      padding: 5rem 2rem;
+      max-width: 64rem;
+      margin: 0 auto;
+    }
+    .features-section h2 {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      letter-spacing: -0.025em;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      border-color: rgba(34, 211, 238, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      width: 3rem; height: 3rem;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      font-size: 1.3rem;
+    }
+    .feature-icon.cyan { background: rgba(34, 211, 238, 0.12); }
+    .feature-icon.green { background: rgba(16, 185, 129, 0.12); }
+    .feature-icon.violet { background: rgba(139, 92, 246, 0.12); }
+
+    .feature-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════════════════════
+       FOOTER
+       ══════════════════════════════════════════════ */
+    .footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .footer strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ══════════════════════════════════════════════
+       RESPONSIVE
+       ══════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .navbar { padding: 1rem; }
+      .hero { min-height: 70vh; padding: 3rem 1.5rem; }
+      .teaser-preview { height: 200px; }
+      .features-grid { grid-template-columns: 1fr; }
+
+      /* Disable custom cursor on touch devices */
+      body { cursor: auto; }
+      .cursor-dot { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated gradient background -->
+  <div class="gradient-bg"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Custom cursor -->
+  <div class="cursor-dot" id="cursor"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">Gaurav</div>
+    <div class="navbar-links">
+      <a href="#project">Project</a>
+      <a href="#features">Features</a>
+      <a href="/" class="btn-glow" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">
+        View Project <span class="arrow">→</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Academic Project
+    </div>
+    <h1>
+      Indoor Navigation<br />
+      <span class="gradient-text">System</span>
+    </h1>
+    <p>
+      An intelligent wayfinding solution for the VIT PRP Academic Block. Graph-based pathfinding with A* algorithm, multi-floor support, and real-time visual guidance.
+    </p>
+    <a href="/" class="btn-glow">
+      View Project <span class="arrow">→</span>
+    </a>
+  </section>
+
+  <!-- Project Teaser -->
+  <section class="teaser-section" id="project">
+    <div class="teaser-card">
+      <div class="teaser-preview">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="building-shapes">
+          <div class="shape-hex shape"></div>
+          <div class="shape-sq shape"></div>
+          <div class="shape-hex shape"></div>
+          <div class="shape-sq shape"></div>
+          <div class="shape-hex shape"></div>
+        </div>
+        <div class="preview-label">PRP Academic Block — 5 Blocks · 3 Floors</div>
+      </div>
+      <div class="teaser-info">
+        <h3>VIT PRP Academic Block Navigation</h3>
+        <p>
+          Navigate a sprawling 5-block academic complex with intelligent pathfinding. The system models the building as a graph with rooms, corridors, stairs, and elevators as nodes, finding optimal routes using the A* algorithm and Dijkstra's algorithm for nearest-facility search.
+        </p>
+        <div class="teaser-tags">
+          <span>Next.js</span>
+          <span>TypeScript</span>
+          <span>A* Algorithm</span>
+          <span>SVG Maps</span>
+          <span>Multi-Floor</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section" id="features">
+    <h2>Key Features</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon cyan">📍</div>
+        <h3>Interactive Maps</h3>
+        <p>Zoomable, pannable SVG floor plans with color-coded rooms, corridors, and facilities. Real-time path overlay.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">⚡</div>
+        <h3>Smart Routing</h3>
+        <p>A* pathfinding calculates optimal routes across multiple floors with distance-based heuristics and floor change penalties.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon violet">🔍</div>
+        <h3>Instant Search</h3>
+        <p>Find any classroom, lab, office, or facility with full-text search. Auto-find nearest washroom, water, or elevator.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p><strong>Indoor Navigation System</strong></p>
+    <p style="margin-top: 0.5rem;">VIT PRP Academic Block · Designed &amp; Built by Gaurav</p>
+  </footer>
+
+  <!-- Cursor Script -->
+  <script>
+    const cursor = document.getElementById('cursor');
+    let mouseX = 0, mouseY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+    });
+
+    // Expand cursor on interactive elements
+    const interactives = document.querySelectorAll('a, button, .feature-card, .teaser-card');
+    interactives.forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('expanded'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('expanded'));
+    });
+  </script>
+</body>
+</html>

@@ -5,7 +5,8 @@ import { searchRooms, getAllRooms, matchCategory, matchBroadCategories, CATEGORY
 import { findShortestPath, findNearestByCategory } from "@/lib/pathfinding"
 import type { Room } from "@/lib/building-data"
 import type { Route } from "@/lib/pathfinding"
-import { Building2, MapPin, Navigation, ArrowRightLeft, Trash2, Compass } from "lucide-react"
+import { Building2, MapPin, Navigation, ArrowRightLeft, Trash2, Compass, ArrowUpDown } from "lucide-react"
+import { FLOOR_LABELS } from "@/lib/prp-navigation-graph"
 
 interface NavigationPanelProps {
   onStartSelected?: (nodeId: string) => void
@@ -13,6 +14,9 @@ interface NavigationPanelProps {
   onRouteCalculated?: (route: Route) => void
   selectedRoute?: Route
 }
+
+// ── Stairs/Lift Choice Threshold (10-20% difference) ──
+const CHOICE_THRESHOLD = 0.15 // 15%
 
 export function NavigationPanel({
   onStartSelected,
@@ -50,7 +54,7 @@ export function NavigationPanel({
     return searchRooms(endQuery).slice(0, 25)
   }, [endQuery])
 
-  // Group results by category for display
+  // Group results by category
   const groupedEndResults = useMemo(() => {
     const groups: Record<string, Room[]> = {}
     for (const room of endResults) {
@@ -97,7 +101,6 @@ export function NavigationPanel({
     }
   }
 
-  // Handle "washroom" broad category — find nearest of either gender
   const handleFindNearestBroad = (query: string) => {
     if (!selectedStart) return
     const cats = matchBroadCategories(query)
@@ -135,22 +138,43 @@ export function NavigationPanel({
     setNearestInfo(null)
   }
 
+  // ── Determine via method (stairs vs lift) ─────
+  const viaInfo = useMemo(() => {
+    if (!selectedRoute || selectedRoute.floorChanges === 0) return null
+    const steps = selectedRoute.steps
+    // Find transition types used
+    const transitionTypes = new Set<string>()
+    for (const step of steps) {
+      if (step.type === "stairs") transitionTypes.add("stairs")
+      if (step.type === "elevator") transitionTypes.add("elevator")
+    }
+    if (transitionTypes.has("stairs") && !transitionTypes.has("elevator")) return { via: "Stairs", auto: true }
+    if (transitionTypes.has("elevator") && !transitionTypes.has("stairs")) return { via: "Lift", auto: true }
+    return { via: "Stairs & Lift", auto: true }
+  }, [selectedRoute])
+
+  // Floor label helper
+  const getFloorLabel = (f: number) => FLOOR_LABELS[f] || `Floor ${f}`
+
   return (
-    <div className="w-full p-6">
-      {/* Header */}
+    <div className="w-full p-5">
+      {/* ── Header ────────────────────────────── */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
-          <Building2 className="w-5 h-5 text-white" />
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <Building2 className="w-5 h-5 text-slate-900" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-slate-100">Navigation</h2>
-          <p className="text-xs text-slate-400">Find your way</p>
+          <h2 className="text-lg font-bold text-white">Navigation</h2>
+          <p className="text-xs text-slate-500">Find your way</p>
         </div>
       </div>
 
-      {/* Start Location */}
+      {/* ── Start Location ────────────────────── */}
       <div className="mb-4">
-        <label className="block text-sm font-semibold text-slate-200 mb-2">From</label>
+        <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-300 mb-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          From
+        </label>
         <div className="relative" ref={startRef}>
           <div className="relative flex items-center">
             <MapPin className="absolute left-3 w-4 h-4 text-slate-500 pointer-events-none" />
@@ -163,73 +187,81 @@ export function NavigationPanel({
                 setShowStartDropdown(true)
               }}
               onFocus={() => setShowStartDropdown(true)}
-              className="w-full pl-10 pr-3 py-2.5 border border-slate-600 rounded-lg bg-slate-700 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+              className="w-full pl-10 pr-3 py-2.5 border border-slate-600/50 rounded-xl bg-[#0f172a] text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all duration-200 text-sm"
             />
           </div>
 
           {showStartDropdown && startResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-700 border border-slate-600 rounded-lg shadow-2xl z-20 max-h-60 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-[#1e293b] border border-slate-600/50 rounded-xl shadow-2xl z-20 max-h-60 overflow-y-auto">
               {startResults.map((room) => (
                 <button
                   key={room.id}
                   onClick={() => handleStartSelect(room)}
-                  className="w-full text-left px-4 py-3 hover:bg-slate-600 transition-colors border-b border-slate-600 last:border-b-0 hover:border-emerald-500"
+                  className="w-full text-left px-4 py-2.5 hover:bg-slate-700/60 transition-colors duration-150 border-b border-slate-700/30 last:border-b-0"
                 >
                   <div className="font-medium text-slate-100 text-sm">{room.name}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">Block {room.block} • Floor {room.floor}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Block {room.block} · {getFloorLabel(room.floor)}</div>
                 </button>
               ))}
             </div>
           )}
         </div>
-        {selectedStart && <div className="mt-2 text-xs text-emerald-400 font-medium">✓ {selectedStart.name}</div>}
+        {selectedStart && (
+          <div className="mt-2 text-xs text-emerald-400 font-medium flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            {selectedStart.name}
+          </div>
+        )}
       </div>
 
-      {/* Quick Find Nearest — only when start is selected */}
+      {/* ── Quick Find Nearest ────────────────── */}
       {selectedStart && (
         <div className="mb-4">
-          <label className="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">
-            <Compass className="w-3 h-3 inline mr-1" />
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">
+            <Compass className="w-3 h-3" />
             Find Nearest
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1.5">
             {QUICK_CATEGORIES.map((cat) => {
               const meta = CATEGORY_LABELS[cat]
               return (
                 <button
                   key={cat}
                   onClick={() => handleFindNearest(cat)}
-                  className="flex flex-col items-center gap-1 px-2 py-2.5 rounded-lg bg-slate-700/60 border border-slate-600 hover:bg-emerald-900/40 hover:border-emerald-500/50 transition-all text-center group"
+                  className="flex flex-col items-center gap-0.5 px-2 py-2 rounded-lg bg-[#0f172a] border border-slate-700/50 hover:bg-cyan-900/20 hover:border-cyan-500/30 transition-all duration-200 text-center group"
                 >
-                  <span className="text-lg group-hover:scale-110 transition-transform">{meta?.icon}</span>
-                  <span className="text-[10px] text-slate-300 font-medium leading-tight">{meta?.label}</span>
+                  <span className="text-base group-hover:scale-110 transition-transform duration-200">{meta?.icon}</span>
+                  <span className="text-[9px] text-slate-400 font-medium leading-tight">{meta?.label}</span>
                 </button>
               )
             })}
           </div>
           {nearestInfo && (
-            <div className="mt-2 text-xs text-amber-300 font-medium bg-amber-900/20 border border-amber-700/30 rounded-lg px-3 py-2">
+            <div className="mt-2 text-xs text-amber-300 font-medium bg-amber-900/15 border border-amber-700/25 rounded-xl px-3 py-2">
               {nearestInfo}
             </div>
           )}
         </div>
       )}
 
-      {/* Swap Button */}
+      {/* ── Swap Button ──────────────────────── */}
       <div className="flex justify-center mb-4">
         <button
           onClick={handleSwap}
           disabled={!selectedStart || !selectedEnd}
-          className="p-2 rounded-lg bg-slate-600 text-slate-300 hover:bg-emerald-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="p-2 rounded-lg bg-[#0f172a] text-slate-500 hover:bg-cyan-900/20 hover:text-cyan-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 border border-slate-700/50"
           title="Swap locations"
         >
           <ArrowRightLeft className="w-4 h-4" />
         </button>
       </div>
 
-      {/* End Location */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-slate-200 mb-2">To</label>
+      {/* ── End Location ─────────────────────── */}
+      <div className="mb-5">
+        <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-300 mb-2">
+          <span className="w-2 h-2 rounded-full bg-red-400" />
+          To
+        </label>
         <div className="relative" ref={endRef}>
           <div className="relative flex items-center">
             <MapPin className="absolute left-3 w-4 h-4 text-slate-500 pointer-events-none" />
@@ -240,37 +272,35 @@ export function NavigationPanel({
               onChange={(e) => {
                 setEndQuery(e.target.value)
                 setShowEndDropdown(true)
-                // Check if query matches a category for auto-nearest
                 const cat = matchCategory(e.target.value)
                 if (cat && selectedStart) {
                   handleFindNearest(cat)
                 }
               }}
               onFocus={() => setShowEndDropdown(true)}
-              className="w-full pl-10 pr-3 py-2.5 border border-slate-600 rounded-lg bg-slate-700 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+              className="w-full pl-10 pr-3 py-2.5 border border-slate-600/50 rounded-xl bg-[#0f172a] text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all duration-200 text-sm"
             />
           </div>
 
           {showEndDropdown && endResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-700 border border-slate-600 rounded-lg shadow-2xl z-20 max-h-60 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-[#1e293b] border border-slate-600/50 rounded-xl shadow-2xl z-20 max-h-60 overflow-y-auto">
               {Object.entries(groupedEndResults).map(([cat, rooms]) => {
                 const meta = CATEGORY_LABELS[cat]
                 return (
                   <div key={cat}>
-                    {/* Category header */}
-                    <div className="px-4 py-1.5 bg-slate-800/70 text-xs font-bold text-slate-400 uppercase tracking-wider sticky top-0">
+                    <div className="px-4 py-1.5 bg-[#0f172a]/80 text-xs font-bold text-slate-500 uppercase tracking-wider sticky top-0 border-b border-slate-700/30">
                       {meta?.icon ?? "📌"} {meta?.label ?? cat}
                     </div>
                     {rooms.map((room) => (
                       <button
                         key={room.id}
                         onClick={() => handleEndSelect(room)}
-                        className="w-full text-left px-4 py-2.5 hover:bg-slate-600 transition-colors border-b border-slate-600/50 last:border-b-0"
+                        className="w-full text-left px-4 py-2.5 hover:bg-slate-700/60 transition-colors duration-150 border-b border-slate-700/20 last:border-b-0"
                       >
                         <div className="font-medium text-slate-100 text-sm">{room.name}</div>
-                        <div className="text-xs text-slate-400 mt-0.5">
-                          Block {room.block} • Floor {room.floor}
-                          {room.description && <span className="text-slate-500"> • {room.description}</span>}
+                        <div className="text-xs text-slate-500 mt-0.5">
+                          Block {room.block} · {getFloorLabel(room.floor)}
+                          {room.description && <span className="text-slate-600"> · {room.description}</span>}
                         </div>
                       </button>
                     ))}
@@ -280,66 +310,93 @@ export function NavigationPanel({
             </div>
           )}
         </div>
-        {selectedEnd && <div className="mt-2 text-xs text-emerald-400 font-medium">✓ {selectedEnd.name}</div>}
+        {selectedEnd && (
+          <div className="mt-2 text-xs text-red-400 font-medium flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+            {selectedEnd.name}
+          </div>
+        )}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-2 mb-6">
+      {/* ── Action Buttons ───────────────────── */}
+      <div className="flex gap-2 mb-5">
         <button
           onClick={handleFindRoute}
           disabled={!selectedStart || !selectedEnd}
-          className="flex-1 py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md"
+          className="flex-1 py-2.5 px-4 glow-button bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 rounded-xl font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
         >
           <Navigation className="w-4 h-4" />
           Find Route
         </button>
         <button
           onClick={handleClear}
-          className="px-3 py-2.5 bg-slate-600 text-slate-200 rounded-lg hover:bg-slate-500 transition-colors"
+          className="px-3 py-2.5 bg-[#0f172a] text-slate-400 rounded-xl hover:bg-slate-700 hover:text-slate-200 transition-all duration-200 border border-slate-700/50"
           title="Clear selections"
         >
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Route Details */}
+      {/* ── Route Details ────────────────────── */}
       {selectedRoute && (
-        <div className="bg-gradient-to-br from-emerald-900/30 to-teal-900/30 rounded-lg p-4 border border-emerald-500/50">
-          <h3 className="font-bold text-sm text-emerald-300 mb-3 flex items-center gap-2">
+        <div className="bg-gradient-to-br from-cyan-900/15 to-emerald-900/15 rounded-2xl p-4 border border-cyan-500/25">
+          <h3 className="font-bold text-sm text-cyan-300 mb-3 flex items-center gap-2">
             <Navigation className="w-4 h-4" />
             Route Found
           </h3>
 
-          <div className="space-y-2 mb-4 text-sm">
-            <div className="flex justify-between items-center">
-              <span className="text-emerald-400">Distance:</span>
-              <span className="font-semibold text-emerald-300">{Math.round(selectedRoute.totalDistance)} units</span>
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="bg-[#0f172a]/60 rounded-xl p-2.5 text-center border border-slate-700/30">
+              <div className="text-lg font-bold text-cyan-300">{Math.round(selectedRoute.totalDistance)}</div>
+              <div className="text-[10px] text-slate-500 font-medium uppercase">Distance</div>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-emerald-400">Steps:</span>
-              <span className="font-semibold text-emerald-300">{selectedRoute.steps.length}</span>
+            <div className="bg-[#0f172a]/60 rounded-xl p-2.5 text-center border border-slate-700/30">
+              <div className="text-lg font-bold text-cyan-300">{selectedRoute.steps.length}</div>
+              <div className="text-[10px] text-slate-500 font-medium uppercase">Steps</div>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-emerald-400">Floors:</span>
-              <span className="font-semibold text-emerald-300">{selectedRoute.floorChanges}</span>
+            <div className="bg-[#0f172a]/60 rounded-xl p-2.5 text-center border border-slate-700/30">
+              <div className={`text-lg font-bold ${selectedRoute.floorChanges > 0 ? "text-amber-400" : "text-cyan-300"}`}>
+                {selectedRoute.floorChanges}
+              </div>
+              <div className="text-[10px] text-slate-500 font-medium uppercase">Floors</div>
             </div>
           </div>
 
+          {/* Via indicator */}
+          {viaInfo && (
+            <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-amber-500/8 border border-amber-500/20 rounded-xl">
+              <ArrowUpDown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+              <span className="text-xs text-amber-300 font-medium">
+                via {viaInfo.via}
+                {viaInfo.auto && <span className="text-amber-500/70 ml-1">(fastest)</span>}
+              </span>
+            </div>
+          )}
+
           {/* Directions */}
-          <div className="bg-slate-700/50 rounded-lg p-3 max-h-48 overflow-y-auto border border-slate-600">
-            <h4 className="text-xs font-bold text-slate-200 mb-2 uppercase">Directions</h4>
+          <div className="bg-[#0f172a]/60 rounded-xl p-3 max-h-48 overflow-y-auto border border-slate-700/30">
+            <h4 className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Directions</h4>
             <ol className="space-y-1.5 text-xs">
-              {selectedRoute.steps.slice(0, 6).map((step, idx) => (
-                <li key={idx} className="text-slate-300 flex gap-2">
-                  <span className="font-bold text-emerald-400 flex-shrink-0">{idx + 1}.</span>
-                  <span>
-                    <span className="font-medium">{step.instruction}</span>
-                    <span className="text-slate-500"> (F{step.floor})</span>
-                  </span>
-                </li>
-              ))}
-              {selectedRoute.steps.length > 6 && (
-                <li className="text-emerald-400 font-medium">...and {selectedRoute.steps.length - 6} more steps</li>
+              {selectedRoute.steps.slice(0, 8).map((step, idx) => {
+                const isFloorChange = idx > 0 && selectedRoute.steps[idx - 1].floor !== step.floor
+                return (
+                  <li key={idx} className={`flex gap-2 ${isFloorChange ? "pt-1.5 border-t border-amber-500/20" : ""}`}>
+                    <span className={`font-bold flex-shrink-0 ${
+                      isFloorChange ? "text-amber-400" :
+                      idx === 0 ? "text-emerald-400" :
+                      idx === selectedRoute.steps.length - 1 ? "text-red-400" :
+                      "text-cyan-400"
+                    }`}>{idx + 1}.</span>
+                    <span className="text-slate-300">
+                      <span className="font-medium">{step.instruction}</span>
+                      <span className="text-slate-600 ml-1">({getFloorLabel(step.floor)})</span>
+                    </span>
+                  </li>
+                )
+              })}
+              {selectedRoute.steps.length > 8 && (
+                <li className="text-cyan-400 font-medium pt-1">...and {selectedRoute.steps.length - 8} more steps</li>
               )}
             </ol>
           </div>

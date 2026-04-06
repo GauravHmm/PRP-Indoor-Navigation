@@ -64,17 +64,17 @@ export const C_SHAPES: SubShapeDef[] = [
 
   // Corridor passages — extend INTO hexes on both ends (hex overlay hides overlap)
   // L3(300,290) → L2(350,345)
-  { id: "C_cL3L2", polygon: "311,280 289,300 339,355 361,335" },
+  { id: "C_cL3L2", polygon: "307,284 293,296 343,351 357,339" },
   // L2(360,415) → L1(420,460)
-  { id: "C_cL2L1", polygon: "369,403 351,427 411,472 429,448" },
+  { id: "C_cL2L1", polygon: "365,408 355,422 415,467 425,453" },
   // L1(420,555) → Gem(445,610)
-  { id: "C_cL1DI", polygon: "434,549 406,561 431,616 459,604" },
+  { id: "C_cL1DI", polygon: "428,552 412,560 437,614 453,606" },
   // R3(700,290) → R2(650,345)
-  { id: "C_cR3R2", polygon: "689,280 711,300 661,355 639,335" },
+  { id: "C_cR3R2", polygon: "693,284 707,296 657,351 643,339" },
   // R2(640,415) → R1(580,460)
-  { id: "C_cR2R1", polygon: "631,403 649,427 589,472 571,448" },
+  { id: "C_cR2R1", polygon: "635,408 645,422 585,467 575,453" },
   // R1(580,555) → Gem(555,610)
-  { id: "C_cR1DI", polygon: "566,549 594,561 569,616 541,604" },
+  { id: "C_cR1DI", polygon: "572,552 588,560 563,614 547,606" },
 ]
 
 export const C_FILL = "#dbeafe"
@@ -114,6 +114,24 @@ export function hexPoints(cx: number, cy: number, r: number): string {
 }
 
 export const NODE_COLORS: Record<string, string> = {
-  room: "#3b82f6", corridor: "#94a3b8", intersection: "#8b5cf6",
+  room: "#3b82f6", corridor: "#64748b", intersection: "#8b5cf6",
   entrance: "#10b981", stairs: "#ef4444", elevator: "#f97316",
+}
+
+// Category-based colors for richer node differentiation
+export const CATEGORY_COLORS: Record<string, string> = {
+  room: "#3b82f6",
+  lab: "#8b5cf6",
+  office: "#6366f1",
+  canteen: "#f59e0b",
+  water: "#06b6d4",
+  washroom_male: "#0ea5e9",
+  washroom_female: "#ec4899",
+  sitting: "#a78bfa",
+  stairs: "#ef4444",
+  lift: "#f97316",
+  entrance: "#10b981",
+  electrical: "#eab308",
+  stationary: "#78716c",
+  corridor: "#64748b",
 }

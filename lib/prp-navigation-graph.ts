@@ -116,7 +116,7 @@ const C_NODES: NavNode[] = [
   { id: "C_entE", x: 300, y: 244, floor: 1, block: "C", type: "entrance", name: "To E Block" },
   { id: "C_entA", x: 700, y: 244, floor: 1, block: "C", type: "entrance", name: "To A Block" },
   { id: "C1", x: 500, y: 608, floor: 1, block: "C", type: "entrance", name: "C1 Entrance", description: "main courtyard entrance" },
-  { id: "C3", x: 378, y: 436, floor: 1, block: "C", type: "entrance", name: "C3 Entrance", description: "back entrance, L2-L1 corridor" },
+  { id: "C3", x: 365, y: 425, floor: 1, block: "C", type: "entrance", name: "C3 Entrance", description: "back entrance, L2-L1 corridor" },
 
   // ── L3 HEX (cx=300 cy=272 r=30, directly attached to E) ──
   { id: "L3t", x: 300, y: 248, floor: 1, block: "C", type: "intersection", name: "L3" },
@@ -154,7 +154,7 @@ const C_NODES: NavNode[] = [
   { id: "cD", x: 375, y: 430, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cD2", x: 382, y: 436, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cE", x: 390, y: 440, floor: 1, block: "C", type: "corridor", name: "c" },
-  { id: "L2L1_w", x: 382, y: 435, floor: 1, block: "C", type: "room", name: "Water", description: "drinking water, L2-L1" },
+  { id: "L2L1_w", x: 400, y: 448, floor: 1, block: "C", type: "room", name: "Water", description: "drinking water, L2-L1" },
   { id: "cE2", x: 402, y: 446, floor: 1, block: "C", type: "corridor", name: "c" },
   { id: "cF", x: 405, y: 450, floor: 1, block: "C", type: "corridor", name: "c" },
 
@@ -168,7 +168,7 @@ const C_NODES: NavNode[] = [
   { id: "L1_rc2", x: 462, y: 508, floor: 1, block: "C", type: "corridor", name: "L1" },
   { id: "L1_rc3", x: 460, y: 532, floor: 1, block: "C", type: "corridor", name: "L1" },
   { id: "C_G21", x: 375, y: 492, floor: 1, block: "C", type: "room", name: "G21" },
-  { id: "C_G22", x: 395, y: 445, floor: 1, block: "C", type: "room", name: "G22", description: "Canteen" },
+  { id: "C_G22", x: 377, y: 433, floor: 1, block: "C", type: "room", name: "G22", description: "Canteen" },
   { id: "C_G20", x: 380, y: 532, floor: 1, block: "C", type: "room", name: "G20", description: "Faculty Cabins" },
   // No stairs/lift in L1
   { id: "C_G17", x: 465, y: 490, floor: 1, block: "C", type: "room", name: "G17", description: "Engineering Physics Lab" },
@@ -362,7 +362,16 @@ export const FLOOR_LABELS: Record<number, string> = { 1: "Ground", 2: "1st Floor
 // ═══ FLOOR CLONING ═══
 const _ground: NavNode[] = [...E_NODES, ...A_NODES, ...C_NODES, ...D_NODES, ...B_NODES, ...EXTRA_NODES]
 
-// Clone ALL nodes for another floor (same positions, different IDs/names)
+// Nodes that only exist on Ground Floor (external entrances, courtyard paths)
+const GROUND_ONLY_IDS = new Set([
+  "E1", "E2", "A1", "A2", "C1", "C3", "Bb_ex",
+  "C_entE", "C_entA",
+  "Courtyard", "court_cross", "court_toE", "court_toA", "court_path1", "court_path2",
+  "PRP_back",
+])
+const _cloneable = _ground.filter(n => !GROUND_ONLY_IDS.has(n.id))
+
+// Clone nodes for another floor (same positions, different IDs/names)
 function cloneFloor(nodes: NavNode[], floor: number, prefix: string,
   nameMap: Record<string, {n:string,d?:string,c?:string}>): NavNode[] {
   return nodes.map(nd => {
@@ -429,8 +438,8 @@ const F2_NAMES: Record<string,{n:string,d?:string,c?:string}> = {
   B_G60:{n:"B-201"}, B_G61:{n:"B-202"}, B_G67:{n:"B-203"},
 }
 
-const F1_NODES = cloneFloor(_ground, 2, "F1_", F1_NAMES)
-const F2_NODES = cloneFloor(_ground, 3, "F2_", F2_NAMES)
+const F1_NODES = cloneFloor(_cloneable, 2, "F1_", F1_NAMES)
+const F2_NODES = cloneFloor(_cloneable, 3, "F2_", F2_NAMES)
 
 const _rawNodes: NavNode[] = [..._ground, ...F1_NODES, ...F2_NODES]
 export const navNodes: NavNode[] = _rawNodes.map(n => ({ ...n, category: n.category ?? assignCategory(n) }))
@@ -680,6 +689,7 @@ const _groundEdges: NavEdge[] = [
   { from:"Bb_lf",to:"Bb_i2",distance:8,floor:1,type:"corridor" },
   { from:"B_G67",to:"Bb_i2",distance:8,floor:1,type:"corridor" },
   { from:"B_wr",to:"Bb_ex",distance:8,floor:1,type:"corridor" },
+  { from:"B_wr",to:"Bb_i2",distance:12,floor:1,type:"corridor" },
 
   // ═══ COURTYARD (vertical line to C1, crosses E1-A1 horizontal) ═══
   { from:"Courtyard",to:"court_cross",distance:72,floor:1,type:"corridor" },
@@ -718,10 +728,15 @@ const STAIR_LIFT_IDS = [
   "Db_sl","Db_lf","Bb_sl","Bb_lf",
 ]
 
+// Filter edges that reference ground-only nodes before cloning to upper floors
+const _cloneableEdges = _groundEdges.filter(e =>
+  !GROUND_ONLY_IDS.has(e.from) && !GROUND_ONLY_IDS.has(e.to)
+)
+
 export const navEdges: NavEdge[] = [
   ..._groundEdges,
-  ...cloneEdges(_groundEdges, 2, "F1_"),
-  ...cloneEdges(_groundEdges, 3, "F2_"),
+  ...cloneEdges(_cloneableEdges, 2, "F1_"),
+  ...cloneEdges(_cloneableEdges, 3, "F2_"),
   ...crossFloorEdges(STAIR_LIFT_IDS, "", "F1_", 1),
   ...crossFloorEdges(STAIR_LIFT_IDS, "F1_", "F2_", 2),
 ]
