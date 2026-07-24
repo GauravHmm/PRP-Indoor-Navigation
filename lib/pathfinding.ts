@@ -1,5 +1,5 @@
 import { navNodes, navEdges } from "./prp-navigation-graph"
-import type { NavNode } from "./prp-navigation-graph"
+import type { NavNode, NavEdge } from "./prp-navigation-graph"
 
 export interface PathStep {
   nodeId: string
@@ -18,11 +18,48 @@ export interface Route {
   floorChanges: number
 }
 
-interface OpenNode {
-  nodeId: string
-  gScore: number
-  fScore: number
+// ══════════════════════════════════════════════════════════════
+// PRE-COMPUTED LOOKUP STRUCTURES
+// Built once at module load — eliminates O(n) scans in hot paths
+// ══════════════════════════════════════════════════════════════
+
+interface AdjEntry {
+  neighborId: string
+  distance: number
+  edgeType: NavEdge["type"]
 }
+
+/** O(1) node lookup by ID (replaces navNodes.find()) */
+const nodeMap = new Map<string, NavNode>()
+for (const node of navNodes) {
+  nodeMap.set(node.id, node)
+}
+
+/** O(1) neighbor lookup by node ID (replaces navEdges.filter()) */
+const adjacencyList = new Map<string, AdjEntry[]>()
+for (const edge of navEdges) {
+  // Add forward direction
+  let fromList = adjacencyList.get(edge.from)
+  if (!fromList) { fromList = []; adjacencyList.set(edge.from, fromList) }
+  fromList.push({ neighborId: edge.to, distance: edge.distance, edgeType: edge.type })
+
+  // Add reverse direction (graph is undirected)
+  let toList = adjacencyList.get(edge.to)
+  if (!toList) { toList = []; adjacencyList.set(edge.to, toList) }
+  toList.push({ neighborId: edge.from, distance: edge.distance, edgeType: edge.type })
+}
+
+/** O(1) edge lookup between two specific nodes (replaces navEdges.find()) */
+const edgeMap = new Map<string, number>()
+for (const edge of navEdges) {
+  // Store distance keyed by both directions
+  edgeMap.set(`${edge.from}→${edge.to}`, edge.distance)
+  edgeMap.set(`${edge.to}→${edge.from}`, edge.distance)
+}
+
+// ══════════════════════════════════════════════════════════════
+// A* PATHFINDING
+// ══════════════════════════════════════════════════════════════
 
 function heuristic(a: NavNode, b: NavNode): number {
   const dx = a.x - b.x
@@ -32,22 +69,30 @@ function heuristic(a: NavNode, b: NavNode): number {
 }
 
 export function findShortestPath(startId: string, endId: string): Route | null {
-  const startNode = navNodes.find((n) => n.id === startId)
-  const endNode = navNodes.find((n) => n.id === endId)
+  const startNode = nodeMap.get(startId)
+  const endNode = nodeMap.get(endId)
   if (!startNode || !endNode) return null
 
-  const openSet = new Map<string, OpenNode>()
+  const openSet = new Map<string, { gScore: number; fScore: number }>()
   const closedSet = new Set<string>()
   const gScore = new Map<string, number>()
   const cameFrom = new Map<string, string>()
 
-  openSet.set(startId, { nodeId: startId, gScore: 0, fScore: heuristic(startNode, endNode) })
+  openSet.set(startId, { gScore: 0, fScore: heuristic(startNode, endNode) })
   gScore.set(startId, 0)
 
   while (openSet.size > 0) {
-    const current = [...openSet.values()].reduce((a, b) => (a.fScore < b.fScore ? a : b))
+    // Find node with lowest fScore — iterate the map directly (no spread + reduce)
+    let bestId = ""
+    let bestF = Infinity
+    for (const [id, entry] of openSet) {
+      if (entry.fScore < bestF) {
+        bestF = entry.fScore
+        bestId = id
+      }
+    }
 
-    if (current.nodeId === endId) {
+    if (bestId === endId) {
       const path: string[] = [endId]
       let cid = endId
       while (cameFrom.has(cid)) {
@@ -57,22 +102,25 @@ export function findShortestPath(startId: string, endId: string): Route | null {
       return buildRoute(path)
     }
 
-    openSet.delete(current.nodeId)
-    closedSet.add(current.nodeId)
+    const currentG = openSet.get(bestId)!.gScore
+    openSet.delete(bestId)
+    closedSet.add(bestId)
 
-    const edges = navEdges.filter((e) => e.from === current.nodeId || e.to === current.nodeId)
+    // O(1) neighbor lookup instead of navEdges.filter()
+    const neighbors = adjacencyList.get(bestId)
+    if (!neighbors) continue
 
-    for (const edge of edges) {
-      const nid = edge.from === current.nodeId ? edge.to : edge.from
-      if (closedSet.has(nid)) continue
+    for (const { neighborId, distance } of neighbors) {
+      if (closedSet.has(neighborId)) continue
 
-      const tentG = current.gScore + edge.distance
-      if (tentG < (gScore.get(nid) ?? Infinity)) {
-        cameFrom.set(nid, current.nodeId)
-        gScore.set(nid, tentG)
-        const neighbor = navNodes.find((n) => n.id === nid)
+      const tentG = currentG + distance
+      if (tentG < (gScore.get(neighborId) ?? Infinity)) {
+        cameFrom.set(neighborId, bestId)
+        gScore.set(neighborId, tentG)
+        // O(1) node lookup instead of navNodes.find()
+        const neighbor = nodeMap.get(neighborId)
         if (!neighbor) continue
-        openSet.set(nid, { nodeId: nid, gScore: tentG, fScore: tentG + heuristic(neighbor, endNode) })
+        openSet.set(neighborId, { gScore: tentG, fScore: tentG + heuristic(neighbor, endNode) })
       }
     }
   }
@@ -80,22 +128,25 @@ export function findShortestPath(startId: string, endId: string): Route | null {
   return null
 }
 
+// ══════════════════════════════════════════════════════════════
+// ROUTE BUILDING
+// ══════════════════════════════════════════════════════════════
+
 function buildRoute(path: string[]): Route {
   let totalDistance = 0
   let prevFloor = -1
   let floorChanges = 0
 
   const steps: PathStep[] = path.map((nodeId, i) => {
-    const node = navNodes.find((n) => n.id === nodeId)!
+    const node = nodeMap.get(nodeId)!
     if (prevFloor !== -1 && node.floor !== prevFloor) floorChanges++
     prevFloor = node.floor
 
     if (i < path.length - 1) {
       const next = path[i + 1]
-      const edge = navEdges.find(
-        (e) => (e.from === nodeId && e.to === next) || (e.to === nodeId && e.from === next),
-      )
-      if (edge) totalDistance += edge.distance
+      // O(1) edge distance lookup instead of navEdges.find()
+      const dist = edgeMap.get(`${nodeId}→${next}`)
+      if (dist !== undefined) totalDistance += dist
     }
 
     return {
@@ -126,29 +177,44 @@ function makeInstruction(node: NavNode, idx: number, total: number): string {
   }
 }
 
-// ── Dijkstra: find nearest node matching a category ──────────
+// ══════════════════════════════════════════════════════════════
+// DIJKSTRA: FIND NEAREST NODE BY CATEGORY
+// Uses binary insertion to maintain a sorted priority queue
+// instead of re-sorting the entire array on every iteration.
+// ══════════════════════════════════════════════════════════════
+
+/** Binary search for insertion index in a sorted array (ascending by .d) */
+function binaryInsert(queue: { id: string; d: number }[], entry: { id: string; d: number }): void {
+  let lo = 0, hi = queue.length
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1
+    if (queue[mid].d < entry.d) lo = mid + 1
+    else hi = mid
+  }
+  queue.splice(lo, 0, entry)
+}
 
 export function findNearestByCategory(
   startId: string,
   category: string
 ): Route | null {
-  const startNode = navNodes.find((n) => n.id === startId)
-  if (!startNode) return null
+  if (!nodeMap.has(startId)) return null
 
   const dist = new Map<string, number>()
   const prev = new Map<string, string>()
   const visited = new Set<string>()
+  // Queue stays sorted via binary insertion — no re-sort needed
   const queue: { id: string; d: number }[] = [{ id: startId, d: 0 }]
   dist.set(startId, 0)
 
   while (queue.length > 0) {
-    queue.sort((a, b) => a.d - b.d)
-    const { id: currId, d: currDist } = queue.shift()!
+    // Already sorted — just shift the minimum
+    const { id: currId } = queue.shift()!
 
     if (visited.has(currId)) continue
     visited.add(currId)
 
-    const currNode = navNodes.find((n) => n.id === currId)
+    const currNode = nodeMap.get(currId)
     if (!currNode) continue
 
     // Found a target?
@@ -162,18 +228,19 @@ export function findNearestByCategory(
       return buildRoute(path)
     }
 
-    // Expand neighbors
-    const edges = navEdges.filter(
-      (e) => e.from === currId || e.to === currId
-    )
-    for (const edge of edges) {
-      const nid = edge.from === currId ? edge.to : edge.from
-      if (visited.has(nid)) continue
-      const newDist = currDist + edge.distance
-      if (newDist < (dist.get(nid) ?? Infinity)) {
-        dist.set(nid, newDist)
-        prev.set(nid, currId)
-        queue.push({ id: nid, d: newDist })
+    // O(1) neighbor lookup instead of navEdges.filter()
+    const neighbors = adjacencyList.get(currId)
+    if (!neighbors) continue
+
+    for (const { neighborId, distance } of neighbors) {
+      if (visited.has(neighborId)) continue
+      const currDist = dist.get(currId) ?? 0
+      const newDist = currDist + distance
+      if (newDist < (dist.get(neighborId) ?? Infinity)) {
+        dist.set(neighborId, newDist)
+        prev.set(neighborId, currId)
+        // Binary insertion maintains sort order — O(log n) per insert
+        binaryInsert(queue, { id: neighborId, d: newDist })
       }
     }
   }
@@ -187,9 +254,14 @@ export function findAllByCategory(
   startId: string,
   category: string
 ): { node: NavNode; route: Route }[] {
-  const targets = navNodes.filter((n) => n.category === category)
-  const results: { node: NavNode; route: Route }[] = []
+  // Pre-filter targets using nodeMap values (still need a full scan here,
+  // but this runs rarely and outside the hot pathfinding loop)
+  const targets: NavNode[] = []
+  for (const node of nodeMap.values()) {
+    if (node.category === category) targets.push(node)
+  }
 
+  const results: { node: NavNode; route: Route }[] = []
   for (const target of targets) {
     const route = findShortestPath(startId, target.id)
     if (route) results.push({ node: target, route })
@@ -208,7 +280,7 @@ export function getNearestNodeFromCoordinates(
   let best: NavNode | null = null
   let bestDist = Infinity
 
-  for (const node of navNodes) {
+  for (const node of nodeMap.values()) {
     const dx = node.x - x
     const dy = node.y - y
     const d = dx * dx + dy * dy
