@@ -723,7 +723,7 @@ function cloneEdges(edges: NavEdge[], floor: number, prefix: string): NavEdge[] 
 
 // Cross-floor connections (stairs/lifts between floors)
 // Looks up each node's actual type so elevators get type "elevator" instead of "stairs"
-const _nodeTypeMap = new Map(_groundNodes.map(n => [n.id, n.type]))
+const _nodeTypeMap = new Map(_ground.map(n => [n.id, n.type]))
 
 function crossFloorEdges(stairLiftIds: string[], prefixA: string, prefixB: string, floorA: number): NavEdge[] {
   return stairLiftIds.flatMap(id => {
