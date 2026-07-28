@@ -157,7 +157,7 @@ export function NavigationPanel({
   const getFloorLabel = (f: number) => FLOOR_LABELS[f] || `Floor ${f}`
 
   return (
-    <div className="w-full p-5">
+    <div className="w-full p-4 lg:p-5">
       {/* ── Header ────────────────────────────── */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
@@ -180,6 +180,7 @@ export function NavigationPanel({
             <MapPin className="absolute left-3 w-4 h-4 text-slate-500 pointer-events-none" />
             <input
               type="text"
+              aria-label="Starting location"
               placeholder="Select starting point..."
               value={startQuery}
               onChange={(e) => {
@@ -197,6 +198,7 @@ export function NavigationPanel({
                 <button
                   key={room.id}
                   onClick={() => handleStartSelect(room)}
+                  aria-label={`Select ${room.name} in Block ${room.block} on ${getFloorLabel(room.floor)}`}
                   className="w-full text-left px-4 py-2.5 hover:bg-slate-700/60 transition-colors duration-150 border-b border-slate-700/30 last:border-b-0"
                 >
                   <div className="font-medium text-slate-100 text-sm">{room.name}</div>
@@ -228,6 +230,7 @@ export function NavigationPanel({
                 <button
                   key={cat}
                   onClick={() => handleFindNearest(cat)}
+                  aria-label={`Find nearest ${meta?.label ?? cat}`}
                   className="flex flex-col items-center gap-0.5 px-2 py-2 rounded-lg bg-[#0f172a] border border-slate-700/50 hover:bg-cyan-900/20 hover:border-cyan-500/30 transition-all duration-200 text-center group"
                 >
                   <span className="text-base group-hover:scale-110 transition-transform duration-200">{meta?.icon}</span>
@@ -249,6 +252,7 @@ export function NavigationPanel({
         <button
           onClick={handleSwap}
           disabled={!selectedStart || !selectedEnd}
+          aria-label="Swap starting location and destination"
           className="p-2 rounded-lg bg-[#0f172a] text-slate-500 hover:bg-cyan-900/20 hover:text-cyan-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 border border-slate-700/50"
           title="Swap locations"
         >
@@ -267,6 +271,7 @@ export function NavigationPanel({
             <MapPin className="absolute left-3 w-4 h-4 text-slate-500 pointer-events-none" />
             <input
               type="text"
+              aria-label="Destination"
               placeholder="Select destination..."
               value={endQuery}
               onChange={(e) => {
@@ -295,6 +300,7 @@ export function NavigationPanel({
                       <button
                         key={room.id}
                         onClick={() => handleEndSelect(room)}
+                        aria-label={`Select ${room.name} in Block ${room.block} on ${getFloorLabel(room.floor)}`}
                         className="w-full text-left px-4 py-2.5 hover:bg-slate-700/60 transition-colors duration-150 border-b border-slate-700/20 last:border-b-0"
                       >
                         <div className="font-medium text-slate-100 text-sm">{room.name}</div>
@@ -323,6 +329,7 @@ export function NavigationPanel({
         <button
           onClick={handleFindRoute}
           disabled={!selectedStart || !selectedEnd}
+          aria-label="Find Route"
           className="flex-1 py-2.5 px-4 glow-button bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 rounded-xl font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
         >
           <Navigation className="w-4 h-4" />
@@ -330,6 +337,7 @@ export function NavigationPanel({
         </button>
         <button
           onClick={handleClear}
+          aria-label="Clear all selections"
           className="px-3 py-2.5 bg-[#0f172a] text-slate-400 rounded-xl hover:bg-slate-700 hover:text-slate-200 transition-all duration-200 border border-slate-700/50"
           title="Clear selections"
         >

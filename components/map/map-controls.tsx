@@ -21,7 +21,7 @@ export function MapControls({ zoom, floor, routeFloors, onReset, onFloorChange, 
   return (
     <div className="flex gap-2 justify-between items-center flex-wrap">
       <div className="flex gap-2 items-center">
-        <button onClick={onReset} className="px-4 py-2 bg-slate-700/80 text-slate-200 hover:bg-slate-600 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-600/50">
+        <button onClick={onReset} aria-label="Reset map view" className="px-4 py-2 bg-slate-700/80 text-slate-200 hover:bg-slate-600 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-600/50">
           Reset View
         </button>
         <span className="text-slate-500 text-sm font-mono">{Math.round(zoom * 100)}%</span>
@@ -35,6 +35,7 @@ export function MapControls({ zoom, floor, routeFloors, onReset, onFloorChange, 
           const isOnRoute = routeFloors.includes(fNum)
           return (
             <button key={f} onClick={() => onFloorChange(fNum)}
+              aria-label={`Switch to ${label}`}
               className={`px-3.5 py-1.5 text-xs rounded-lg font-semibold transition-all duration-200 ${
                 isActive
                   ? "bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 shadow-lg shadow-cyan-500/20"
@@ -53,6 +54,7 @@ export function MapControls({ zoom, floor, routeFloors, onReset, onFloorChange, 
       <div className="flex gap-1 flex-wrap">
         {ZOOM_TARGETS.map(b => (
           <button key={b.id} onClick={() => onZoomTo(b.cx, b.cy)}
+            aria-label={`Zoom to Block ${b.id}`}
             className="px-3 py-1.5 text-xs rounded-lg font-semibold transition-all duration-200 hover:scale-105 border"
             style={{ backgroundColor: b.fill + "20", color: b.stroke, borderColor: b.stroke + "40" }}>
             {b.id}

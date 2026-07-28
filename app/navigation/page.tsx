@@ -50,8 +50,8 @@ export default function NavigationApp() {
       </header>
 
       {/* ── Main Content ───────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="max-w-7xl mx-auto px-2 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-4 lg:gap-5">
           {/* Search Panel — Left Sidebar */}
           <div className="lg:col-span-3">
             <div className="sticky top-20">

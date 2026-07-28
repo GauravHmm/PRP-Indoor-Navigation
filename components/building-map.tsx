@@ -115,7 +115,7 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
 
   // ── Render ─────────────────────────────────────
   return (
-    <div className="w-full space-y-4 p-6 glass-panel">
+    <div className="w-full space-y-4 p-3 sm:p-6 glass-panel">
       <MapControls
         zoom={cam.zoom}
         floor={floor}
@@ -132,8 +132,7 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
       {/* ── SVG Map ────────────────────────────── */}
       <div className="rounded-2xl border border-slate-700/50 bg-[#0a0f1e] overflow-hidden select-none shadow-xl">
         <svg ref={svgRef} viewBox={vb}
-          className={`w-full h-auto ${drag ? "cursor-grabbing" : "cursor-grab"}`}
-          style={{ minHeight: "580px" }}
+          className={`w-full h-auto min-h-[400px] lg:min-h-[580px] ${drag ? "cursor-grabbing" : "cursor-grab"}`}
           onWheel={onWheel} onMouseDown={onDown} onMouseMove={onMove} onMouseUp={onUp} onMouseLeave={onUp}>
 
           {/* SVG Defs: glow filters */}
