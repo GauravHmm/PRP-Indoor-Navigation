@@ -169,22 +169,28 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
           {/* Static building geometry */}
           <MapLayers onBlockClick={zoomTo} />
 
-          {/* Route path overlay */}
-          <MapRoutePath routePts={routePts} />
+          {/* Floating interactive layer (lifts off the floor in 3D mode) */}
+          <g style={{ 
+            transform: is3D ? "translateZ(80px)" : "translateZ(0px)", 
+            transition: "transform 0.7s cubic-bezier(0.34,1.56,0.64,1)" 
+          }}>
+            {/* Route path overlay */}
+            <MapRoutePath routePts={routePts} />
 
-          {/* Interactive nodes */}
-          <MapNodes
-            nodes={nodes}
-            zoom={cam.zoom}
-            selectedStart={selectedStart}
-            selectedEnd={selectedEnd}
-            highlightedPath={highlightedPath}
-            transitionNodeIds={transitionNodeIds}
-            onTooltipChange={setTooltip}
-          />
+            {/* Interactive nodes */}
+            <MapNodes
+              nodes={nodes}
+              zoom={cam.zoom}
+              selectedStart={selectedStart}
+              selectedEnd={selectedEnd}
+              highlightedPath={highlightedPath}
+              transitionNodeIds={transitionNodeIds}
+              onTooltipChange={setTooltip}
+            />
 
-          {/* Tooltip */}
-          {tooltip && <MapTooltip tooltip={tooltip} />}
+            {/* Tooltip */}
+            {tooltip && <MapTooltip tooltip={tooltip} />}
+          </g>
         </svg>
       </div>
 
