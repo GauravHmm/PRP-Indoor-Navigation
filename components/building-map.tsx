@@ -28,6 +28,7 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
   const [dStart, setDStart] = useState({ x: 0, y: 0 })
   const [floor, setFloor] = useState(startFloor)
   const [tooltip, setTooltip] = useState<TooltipData | null>(null)
+  const [is3D, setIs3D] = useState(false)
   const svgRef = useRef<SVGSVGElement>(null)
 
   // Content bounds
@@ -123,6 +124,8 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
         onReset={reset}
         onFloorChange={setFloor}
         onZoomTo={zoomTo}
+        is3D={is3D}
+        onToggle3D={() => setIs3D(!is3D)}
       />
 
       {transitionInfo && transitionInfo.length > 0 && (
@@ -130,9 +133,16 @@ export function BuildingMap({ startFloor = 1, highlightedPath, selectedStart, se
       )}
 
       {/* ── SVG Map ────────────────────────────── */}
-      <div className="rounded-2xl border border-slate-700/50 bg-[#0a0f1e] overflow-hidden select-none shadow-xl">
+      <div 
+        className="rounded-2xl border border-slate-700/50 bg-[#0a0f1e] overflow-hidden select-none shadow-xl transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] relative"
+        style={{ perspective: "1500px" }}
+      >
         <svg ref={svgRef} viewBox={vb}
-          className={`w-full h-auto min-h-[400px] lg:min-h-[580px] ${drag ? "cursor-grabbing" : "cursor-grab"}`}
+          className={`w-full h-auto min-h-[400px] lg:min-h-[580px] origin-center transition-transform duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${drag ? "cursor-grabbing" : "cursor-grab"}`}
+          style={{ 
+            transformStyle: "preserve-3d",
+            transform: is3D ? "rotateX(55deg) rotateZ(-40deg) scale(1.4) translateY(-10%)" : "rotateX(0deg) rotateZ(0deg) scale(1) translateY(0%)" 
+          }}
           onWheel={onWheel} onMouseDown={onDown} onMouseMove={onMove} onMouseUp={onUp} onMouseLeave={onUp}>
 
           {/* SVG Defs: glow filters */}

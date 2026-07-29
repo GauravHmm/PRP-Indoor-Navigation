@@ -10,6 +10,8 @@ interface MapControlsProps {
   onReset: () => void
   onFloorChange: (floor: number) => void
   onZoomTo: (cx: number, cy: number) => void
+  is3D?: boolean
+  onToggle3D?: () => void
 }
 
 const ZOOM_TARGETS = [
@@ -17,14 +19,27 @@ const ZOOM_TARGETS = [
   { id: "C", cx: 500, cy: 380, fill: C_FILL, stroke: C_STROKE },
 ]
 
-export function MapControls({ zoom, floor, routeFloors, onReset, onFloorChange, onZoomTo }: MapControlsProps) {
+export function MapControls({ zoom, floor, routeFloors, onReset, onFloorChange, onZoomTo, is3D, onToggle3D }: MapControlsProps) {
   return (
     <div className="flex gap-2 justify-between items-center flex-wrap">
       <div className="flex gap-2 items-center">
-        <button onClick={onReset} aria-label="Reset map view" className="px-4 py-2 bg-slate-700/80 text-slate-200 hover:bg-slate-600 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-600/50">
+        <button onClick={onReset} aria-label="Reset map view" className="px-4 py-2 bg-slate-700/80 text-slate-200 hover:bg-slate-600 rounded-xl text-sm font-medium transition-all duration-200 border border-slate-600/50 shadow-sm">
           Reset View
         </button>
-        <span className="text-slate-500 text-sm font-mono">{Math.round(zoom * 100)}%</span>
+        {onToggle3D && (
+          <button 
+            onClick={onToggle3D} 
+            aria-label={is3D ? "Switch to 2D view" : "Switch to 3D view"}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 border shadow-sm ${
+              is3D 
+                ? "bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-900 border-transparent shadow-cyan-500/30" 
+                : "bg-[#0f172a] text-cyan-400 hover:text-cyan-300 hover:bg-cyan-950/30 border-cyan-500/30"
+            }`}
+          >
+            {is3D ? "3D Mode" : "2D Mode"}
+          </button>
+        )}
+        <span className="text-slate-500 text-sm font-mono ml-1">{Math.round(zoom * 100)}%</span>
       </div>
 
       {/* Floor selector */}
