@@ -101,13 +101,41 @@ export function MapNodes({
               </circle>
             )}
 
-            {/* Main node circle */}
-            <circle cx={n.x} cy={n.y} r={r}
-              fill={isTransition && onPath ? "#facc15" : col}
-              stroke={strokeCol}
-              strokeWidth={strokeW}
-              opacity={opacity}
-              className="transition-all duration-200" />
+            {/* Main node circle (hide standard circle if it's the end node, we draw a pin instead) */}
+            {!isEn && (
+              <circle cx={n.x} cy={n.y} r={r}
+                fill={isTransition && onPath ? "#facc15" : col}
+                stroke={strokeCol}
+                strokeWidth={strokeW}
+                opacity={opacity}
+                className="transition-all duration-200" />
+            )}
+
+            {/* Premium Bouncing Destination Pin */}
+            {isEn && (
+              <g transform={`translate(${n.x}, ${n.y})`} className="pointer-events-none">
+                <g>
+                  <animateTransform 
+                    attributeName="transform" 
+                    type="translate" 
+                    values="0,-2; 0,-5; 0,-2" 
+                    dur="1.5s" 
+                    repeatCount="indefinite" 
+                  />
+                  {/* Pin drop shadow */}
+                  <ellipse cx="0" cy="2" rx="3" ry="1.5" fill="rgba(0,0,0,0.3)" />
+                  {/* Pin body */}
+                  <path 
+                    d="M 0 0 C -3 -4 -5.5 -7 -5.5 -10.5 A 5.5 5.5 0 1 1 5.5 -10.5 C 5.5 -7 3 -4 0 0 Z" 
+                    fill="#ef4444" 
+                    stroke="#7f1d1d" 
+                    strokeWidth="0.5" 
+                  />
+                  {/* Pin inner dot */}
+                  <circle cx="0" cy="-10.5" r="2" fill="#ffffff" />
+                </g>
+              </g>
+            )}
 
             {/* Node label */}
             {zoom >= 1.8 && (isRoom || isInfra) && (
